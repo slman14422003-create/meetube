@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mobile_playlist_by_owner">بواسطة %1$s</string>
+    <string name="mobile_playlist_type">قائمة تشغيل</string>
+    <string name="mobile_playlist_download_all">تنزيل الكل</string>
+    <string name="mobile_playlist_download_confirm">تنزيل %1$d فيديو؟</string>
+    <string name="mobile_playlist_download_quality">جودة التنزيل لجميع الفيديوهات</string>
+    <string name="mobile_playlist_download_best">أفضل جودة متاحة</string>
+    <string name="mobile_playlist_download_queued">تمت إضافة %1$d فيديو إلى قائمة الانتظار</string>
+    <string name="mobile_playlist_download_skipped">تمت إضافة %1$d فيديو إلى قائمة الانتظار. %2$d غير متاح.</string>
+    <string name="mobile_playlist_load_failed">تعذّر تحميل قائمة التشغيل كاملة. حاول مرة أخرى.</string>
+    <string name="mobile_playlist_sort">ترتيب حسب</string>
+    <string name="mobile_playlist_sort_manual">يدوي</string>
+    <string name="mobile_playlist_sort_newest">تاريخ النشر (الأحدث)</string>
+    <string name="mobile_playlist_sort_oldest">تاريخ النشر (الأقدم)</string>
+    <string name="mobile_playlist_sort_popular">الأكثر رواجًا</string>
+    <string name="mobile_playlist_filter_all">الكل</string>
+    <string name="mobile_playlist_filter_videos">الفيديوهات</string>
+    <string name="mobile_playlist_filter_shorts">Shorts</string>
+    <string name="mobile_playlist_download_select">تحديد الفيديوهات</string>
+    <string name="mobile_playlist_select_all">تحديد الكل</string>
+    <string name="mobile_playlist_selected">تم تحديد %1$d</string>
+    <string name="mobile_playlist_download_selected">تنزيل</string>
+    <string name="mobile_playlist_add_videos">إضافة فيديوهات</string>
+    <string name="mobile_playlist_add_hint">ابحث للإضافة إلى %1$s</string>
+    <string name="mobile_playlist_loading">جارٍ تحميل قائمة التشغيل</string>
+    <plurals name="mobile_playlist_video_count">
+        <item quantity="zero">لا توجد فيديوهات</item>
+        <item quantity="one">فيديو واحد</item>
+        <item quantity="two">فيديوان</item>
+        <item quantity="few">%d فيديوهات</item>
+        <item quantity="many">%d فيديو</item>
+        <item quantity="other">%d فيديو</item>
+    </plurals>
+</resources>

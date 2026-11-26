@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mobile_web_signin_title">تسجيل الدخول إلى YouTube</string>
+    <string name="mobile_web_signin_privacy">هذه صفحة Google نفسها. لا يطّلع MeeTube على كلمة المرور الخاصة بك أبدًا.</string>
+    <string name="mobile_web_signin_loading">جارٍ فتح Google</string>
+    <string name="mobile_web_signin_finishing">جارٍ إنهاء تسجيل الدخول</string>
+    <string name="mobile_web_signin_failed">تعذّر إكمال تسجيل الدخول إلى YouTube. تحقق من اتصالك وحاول مرة أخرى.</string>
+    <string name="mobile_web_signin_retry">إعادة المحاولة</string>
+    <string name="mobile_web_signin_explain_title">تسجيل دخول إضافي</string>
+    <string name="mobile_web_signin_explain_need">يتطلب إرسال رسائل الدردشة المباشرة والإعجاب بالمنشورات تسجيل الدخول من صفحة الويب الخاصة بـ YouTube. يستغرق ذلك دقيقة واحدة وتفعله مرة واحدة فقط.</string>
+    <string name="mobile_web_signin_explain_current">يبقى تسجيل دخولك الحالي كما هو ويواصل التعامل مع الفيديوهات والسجل والاشتراكات.</string>
+    <string name="mobile_web_signin_explain_risk">استخدم حساب Google نفسه. لا توافق Google على التطبيقات غير الرسمية، لذا توجد مخاطرة بسيطة على الحساب الذي تستخدمه.</string>
+    <string name="mobile_web_signin_google">تسجيل الدخول باستخدام Google</string>
+    <string name="mobile_web_signin_not_now">ليس الآن</string>
+    <string name="mobile_web_signin_sign_out">تسجيل الخروج من تسجيل دخول الويب إلى YouTube؟</string>
+    <string name="mobile_web_signin_sign_out_confirm">ستحتاج إلى تسجيل الدخول مرة أخرى لإرسال رسائل الدردشة المباشرة. يبقى تسجيل دخولك الحالي في MeeTube كما هو.</string>
+    <string name="mobile_web_signin_sign_out_failed">تعذّر تسجيل الخروج. حاول مرة أخرى.</string>
+    <string name="mobile_web_signin_signed_out">تم تسجيل الخروج من تسجيل دخول الويب إلى YouTube</string>
+    <string name="mobile_web_signin_add">إضافة حساب ويب</string>
+    <string name="mobile_web_signin_choose">الدردشة باسم</string>
+    <string name="mobile_web_signin_switch">تبديل حساب الويب</string>
+    <string name="mobile_web_signin_expired">انتهت صلاحية تسجيل دخولك إلى YouTube على الويب. سجّل الدخول مرة أخرى.</string>
+    <string name="mobile_chat_as">الدردشة باسم %1$s</string>
+    <string name="mobile_chat_hint">اكتب شيئًا</string>
+    <string name="mobile_chat_send">إرسال الرسالة</string>
+    <string name="mobile_chat_send_failed">تعذّر إرسال رسالتك. حاول مرة أخرى.</string>
+    <string name="mobile_chat_not_ready">الدردشة غير جاهزة بعد. حاول مرة أخرى بعد قليل.</string>
+</resources>
