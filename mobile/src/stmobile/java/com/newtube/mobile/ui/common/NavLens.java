@@ -82,7 +82,7 @@ public final class NavLens extends View {
      */
     public static boolean enabled(Context context) {
         return PrefCache.has(context, PREFS, KEY_MOTION)
-                ? PrefCache.getBoolean(context, PREFS, KEY_MOTION, true) : !lowEnd(context);
+                ? PrefCache.getBoolean(context, PREFS, KEY_MOTION, true) : false; // off until turned on: the lens re-blurs the page on every tab switch
     }
 
     public static void setEnabled(Context context, boolean on) {

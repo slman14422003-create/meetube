@@ -23,7 +23,8 @@ public final class HighRefresh {
     }
 
     public static boolean isEnabled(Context context) {
-        return PrefCache.getBoolean(context, PREFS, KEY, false);
+        // On unless the person turned it off: without it Android drops to 60 Hz between touches.
+        return PrefCache.getBoolean(context, PREFS, KEY, true);
     }
 
     public static void setEnabled(Context context, boolean on) {

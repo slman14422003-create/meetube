@@ -34,7 +34,7 @@ public final class Glass {
         return sEpoch;
     }
 
-    /** The saved Glass quality; untouched, Light on a low-end phone (NavLens#lowEnd) and Full otherwise. */
+    /** The saved Glass quality; untouched, Light. */
     public static int quality(android.content.Context context) {
         if (PrefCache.has(context, PREFS, KEY_QUALITY)) {
             return PrefCache.getInt(context, PREFS, KEY_QUALITY, QUALITY_FULL);
@@ -42,7 +42,9 @@ public final class Glass {
         if (!PrefCache.getBoolean(context, PREFS, KEY_LIVE_BLUR, true)) {
             return QUALITY_FLAT;
         }
-        return NavLens.lowEnd(context) ? QUALITY_LIGHT : QUALITY_FULL;
+        // Light for everyone until the person picks Full: Full re-samples the page with a seven-band lens
+        // on every glass, every frame, which drops frames while scrolling and switching tabs.
+        return QUALITY_LIGHT;
     }
 
     public static void setQuality(android.content.Context context, int quality) {
