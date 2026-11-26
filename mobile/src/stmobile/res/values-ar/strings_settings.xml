@@ -157,6 +157,13 @@
     <string name="mobile_settings_notify_note">يتم التحقق من الفيديوهات الجديدة وفق جدول، دون دفع فوري: يسمح Android للتطبيق بالتحقق كل 15 دقيقة على الأكثر. وتوقف بعض الهواتف (Infinix وXiaomi وOppo وVivo وغيرها) عمليات التحقق في الخلفية ما لم يُسمح لـ MeeTube بالعمل في الخلفية، لذا اسمح بذلك أعلاه.</string>
     <string name="mobile_settings_24_hour">استخدام تنسيق 24 ساعة</string>
     <string name="mobile_settings_24_hour_summary">لأوقات بدء العروض الأولى والبث المباشر</string>
+    <string name="mobile_settings_glass_quality">جودة الزجاج</string>
+    <string name="mobile_settings_glass_quality_full">كاملة</string>
+    <string name="mobile_settings_glass_quality_full_desc">بلور حي وعدسة كاملة. الأجمل على الهواتف السريعة</string>
+    <string name="mobile_settings_glass_quality_light">خفيفة</string>
+    <string name="mobile_settings_glass_quality_light_desc">بلور حي وعدسة أخف على الزجاج الصغير فقط</string>
+    <string name="mobile_settings_glass_quality_flat">مسطّحة</string>
+    <string name="mobile_settings_glass_quality_flat_desc">بدون بلور حي: لون زجاجي بسيط. الأسلس على الهواتف الأضعف</string>
     <string name="mobile_settings_liquid_glass">الزجاج السائل</string>
     <string name="mobile_settings_liquid_glass_summary">تأثيرات العدسة والإضاءة والحبيبات على الأشرطة الزجاجية. عند الإيقاف: تمويه زجاجي بسيط يستهلك بطارية أقل</string>
     <string name="mobile_settings_indian_counts">عرض الأعداد باللاك والكرور</string>

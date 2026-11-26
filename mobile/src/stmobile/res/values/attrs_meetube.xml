@@ -27,6 +27,8 @@
         <attr name="glassCornerRadius" format="dimension" />
         <attr name="glassTint" format="color" />
         <attr name="glassLiquid" format="boolean" />
+        <!-- A flat tint in the glass's shape: no backdrop sampling, no lens, no grain, no rim. -->
+        <attr name="glassPlain" format="boolean" />
         <!-- On a surface that is already glass (a frosted sheet): no backdrop of its own, and the
              tint stays see-through instead of the near-opaque no-backdrop fallback. -->
         <attr name="glassOnGlass" format="boolean" />

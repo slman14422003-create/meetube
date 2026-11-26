@@ -147,6 +147,13 @@
     <string name="mobile_settings_notify_note">New videos are checked on a schedule, not pushed: Android lets an app check every 15 minutes at most. Some phones (Infinix, Xiaomi, Oppo, Vivo and others) also stop background checks unless MeeTube may run in the background, so allow it above.</string>
     <string name="mobile_settings_24_hour">Use 24-hour time</string>
     <string name="mobile_settings_24_hour_summary">For the start times of premieres and live streams</string>
+    <string name="mobile_settings_glass_quality">Glass quality</string>
+    <string name="mobile_settings_glass_quality_full">Full</string>
+    <string name="mobile_settings_glass_quality_full_desc">Live blur and the full lens. The smoothest look on a fast phone</string>
+    <string name="mobile_settings_glass_quality_light">Light</string>
+    <string name="mobile_settings_glass_quality_light_desc">Live blur with a lighter lens on small glass only</string>
+    <string name="mobile_settings_glass_quality_flat">Flat</string>
+    <string name="mobile_settings_glass_quality_flat_desc">No live blur: a plain tint. The smoothest on a slower phone</string>
     <string name="mobile_settings_liquid_glass">Liquid glass</string>
     <string name="mobile_settings_liquid_glass_summary">Lens, light and grain on the glass bars. Off: a plain frosted blur that is easier on the battery</string>
     <string name="mobile_settings_indian_counts">Lakh and crore counts</string>
