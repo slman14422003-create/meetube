@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.liskovsoft.smartyoutubetv2.common.app.models.search.vineyard.Tag;
@@ -60,21 +61,63 @@ public class SearchTagAdapter extends RecyclerView.Adapter<SearchTagAdapter.TagV
     public void setHistoryMode(boolean historyMode) {
         if (mHistoryMode != historyMode) {
             mHistoryMode = historyMode;
-            notifyDataSetChanged();
+            if (!mTags.isEmpty()) {
+                notifyItemRangeChanged(0, mTags.size());
+            }
         }
     }
 
     public void setTags(List<Tag> tags) {
+        List<Tag> old = new ArrayList<>(mTags);
         mTags.clear();
         if (tags != null) {
             mTags.addAll(tags);
         }
-        notifyDataSetChanged();
+        DiffUtil.calculateDiff(new TagDiff(old, mTags), false).dispatchUpdatesTo(this);
     }
 
     public void clearTags() {
+        int count = mTags.size();
         mTags.clear();
-        notifyDataSetChanged();
+        if (count > 0) {
+            notifyItemRangeRemoved(0, count);
+        }
+    }
+
+    private static final class TagDiff extends DiffUtil.Callback {
+        private final List<Tag> mOld;
+        private final List<Tag> mNew;
+
+        TagDiff(List<Tag> oldTags, List<Tag> newTags) {
+            mOld = oldTags;
+            mNew = newTags;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return mOld.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return mNew.size();
+        }
+
+        private static String text(Tag tag) {
+            return tag != null ? tag.tag : null;
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldPosition, int newPosition) {
+            String a = text(mOld.get(oldPosition));
+            String b = text(mNew.get(newPosition));
+            return a == null ? b == null : a.equals(b);
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldPosition, int newPosition) {
+            return mOld.get(oldPosition) == mNew.get(newPosition) || areItemsTheSame(oldPosition, newPosition);
+        }
     }
 
     public void removeTag(Tag tag) {

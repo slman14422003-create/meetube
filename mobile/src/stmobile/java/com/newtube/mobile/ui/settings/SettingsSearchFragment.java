@@ -19,6 +19,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -109,6 +110,8 @@ public final class SettingsSearchFragment extends Fragment {
         // rows would throw the saved scroll position away.
         mAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
         mResults.setLayoutManager(new LinearLayoutManager(requireContext()));
+        mResults.setHasFixedSize(true);
+        mResults.setItemViewCacheSize(8);
         mResults.setAdapter(mAdapter);
         mResults.setItemAnimator(null);
         mResults.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -249,9 +252,32 @@ public final class SettingsSearchFragment extends Fragment {
         }
 
         void submit(List<SettingsSearch.Entry> entries, String query) {
+            List<SettingsSearch.Entry> old = mEntries;
+            String oldQuery = mQuery;
             mEntries = entries;
             mQuery = query;
-            notifyDataSetChanged();
+            boolean sameQuery = oldQuery.equals(query);
+            DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return old.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return entries.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldPosition, int newPosition) {
+                    return old.get(oldPosition) == entries.get(newPosition);
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldPosition, int newPosition) {
+                    return sameQuery; // the bold matched words follow the query
+                }
+            }, false).dispatchUpdatesTo(this);
         }
 
         @Override

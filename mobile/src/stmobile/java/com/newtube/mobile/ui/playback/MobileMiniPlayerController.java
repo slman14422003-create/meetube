@@ -46,6 +46,8 @@ public final class MobileMiniPlayerController {
     private final ProgressBar mProgress;
     private final MiniControls mControls;
     private final Runnable mTick = this::onTick;
+    private int mLastProgress = -1;
+    private int mLastKey = Integer.MIN_VALUE;
     /**
      * SCREEN-ON (#50): the card's screen-on hold follows the player's own events, not the 500 ms
      * tick. The tick stops when the host pauses, but the card stays up (frozen, audio playing) while
@@ -167,7 +169,7 @@ public final class MobileMiniPlayerController {
                     .setInterpolator(new android.view.animation.LinearInterpolator());
         } else {
             resetTransform();
-            exit = mBar.animate().alpha(0f).scaleX(0.9f).scaleY(0.9f)
+            exit = mBar.animate().alpha(0f)
                     .setDuration(Motion.EXIT_MS).setInterpolator(Motion.EMPHASIZED_ACCELERATE);
         }
         exit.withLayer().withEndAction(() -> {
@@ -267,6 +269,7 @@ public final class MobileMiniPlayerController {
         mControls.show();
         updatePlayPause(player);
 
+        mLastKey = Integer.MIN_VALUE;
         Utils.removeCallbacks(mTick);
         Utils.postDelayed(mTick, TICK_MS);
 
@@ -531,10 +534,20 @@ public final class MobileMiniPlayerController {
         }
         long duration = player.getDuration();
         if (duration > 0) {
-            mProgress.setProgress((int) (player.getCurrentPosition() * 1000 / duration));
+            int progress = (int) (player.getCurrentPosition() * 1000 / duration);
+            if (progress != mLastProgress) {
+                mLastProgress = progress;
+                mProgress.setProgress(progress);
+            }
         }
-        updatePlayPause(player);
-        MiniPlayerBridge.fitToVideo(mFrame); // an autoplayed next video may have another shape
+        int key = (player.getPlayWhenReady() ? 1 : 0) | (player.getPlaybackState() << 1)
+                | (MobilePlaybackActivity.sAudioOnly ? 1 << 4 : 0)
+                | (System.identityHashCode(MiniPlayerBridge.getVideo()) << 5);
+        if (key != mLastKey) {
+            mLastKey = key;
+            updatePlayPause(player);
+            MiniPlayerBridge.fitToVideo(mFrame); // an autoplayed next video may have another shape
+        }
         Utils.postDelayed(mTick, TICK_MS);
     }
 

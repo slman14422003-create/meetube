@@ -160,6 +160,25 @@ public final class MeeTunePlayerSkin {
         }
     };
 
+    private final android.view.ViewTreeObserver.OnWindowFocusChangeListener mFocusListener =
+            new android.view.ViewTreeObserver.OnWindowFocusChangeListener() {
+                @Override
+                public void onWindowFocusChanged(boolean focus) {
+                    if (focus) {
+                        resumeTick();
+                    } else {
+                        mRoot.removeCallbacks(mTick);
+                    }
+                }
+            };
+
+    private void resumeTick() {
+        mRoot.removeCallbacks(mTick);
+        if (mRoot.getVisibility() == View.VISIBLE && mRoot.isAttachedToWindow() && mRoot.hasWindowFocus()) {
+            mRoot.post(mTick);
+        }
+    }
+
     MeeTunePlayerSkin(ViewGroup parent, Controls controls) {
         mControls = controls;
         Context context = parent.getContext();
@@ -262,6 +281,22 @@ public final class MeeTunePlayerSkin {
             footLyrics();
             return true;
         });
+        mRoot.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                mRoot.getViewTreeObserver().addOnWindowFocusChangeListener(mFocusListener);
+                resumeTick();
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                mRoot.getViewTreeObserver().removeOnWindowFocusChangeListener(mFocusListener);
+                mRoot.removeCallbacks(mTick);
+            }
+        });
+        if (mRoot.isAttachedToWindow()) {
+            mRoot.getViewTreeObserver().addOnWindowFocusChangeListener(mFocusListener);
+        }
 
         handle.setOnClickListener(v -> mControls.minimize());
         mArt.setOnClickListener(v -> mControls.minimize());
@@ -1962,6 +1997,9 @@ public final class MeeTunePlayerSkin {
         mRoot.setTranslationY(0f);
         mRoot.setVisibility(View.VISIBLE);
         com.newtube.mobile.ui.common.Motion.frostIn(mRoot); // out of blur, as MeeTube's pages come in
+        mTimeKey = Long.MIN_VALUE;
+        mShownPlaying = null;
+        mShownStar = 0;
         mRoot.removeCallbacks(mTick);
         mRoot.post(mTick);
         if (mCanvasClip != null) startCanvas(mCanvasClip);
@@ -1997,6 +2035,10 @@ public final class MeeTunePlayerSkin {
         return mVideo != null && com.newtube.mobile.ui.meetune.MeeTune.liked(mVideo.videoId);
     }
 
+    private long mTimeKey = Long.MIN_VALUE;
+    @Nullable private Boolean mShownPlaying;
+    private int mShownStar;
+
     private void update() {
         long duration = mControls.duration();
         long position = mControls.position();
@@ -2008,18 +2050,29 @@ public final class MeeTunePlayerSkin {
             mRemaining.setText("");
         } else if (!mSeeking) {
             mSeek.setProgress(duration > 0 ? (int) (position * 1000 / duration) : 0);
-            showTimes(position, duration);
+            long timeKey = ((position / 1000) * 31 + duration / 1000) * 2
+                    + (android.os.SystemClock.uptimeMillis() < mShowTotalUntil ? 1 : 0);
+            if (timeKey != mTimeKey) {
+                mTimeKey = timeKey;
+                showTimes(position, duration);
+            }
         }
         boolean playing = mControls.playing();
-        mPlay.setImageResource(playing ? R.drawable.ic_meetune_pause : R.drawable.ic_meetune_play);
+        if (mShownPlaying == null || mShownPlaying != playing) {
+            mShownPlaying = playing;
+            mPlay.setImageResource(playing ? R.drawable.ic_meetune_pause : R.drawable.ic_meetune_play);
+        }
         if (mWasPlaying != null && mWasPlaying != playing) popTitle(playing);
         mWasPlaying = playing;
         if (mCanvasPlayer != null && mCanvasPlayer.getPlayWhenReady() != playing) {
             mCanvasPlayer.setPlayWhenReady(playing); // the moving cover rests while the song does
         }
         int star = liked() ? R.drawable.ic_meetune_heart_filled : R.drawable.ic_meetune_heart;
-        mLike.setImageResource(star);
-        mHeadLike.setImageResource(star);
+        if (star != mShownStar) {
+            mShownStar = star;
+            mLike.setImageResource(star);
+            mHeadLike.setImageResource(star);
+        }
         followLyrics(position);
         if (mAudio != null && !mVolume.isPressed()) { // the keys moved it, or the drag ended between steps
             int step = mAudio.getStreamVolume(AudioManager.STREAM_MUSIC);

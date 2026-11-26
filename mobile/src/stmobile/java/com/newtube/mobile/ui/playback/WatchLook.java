@@ -1,5 +1,6 @@
 package com.newtube.mobile.ui.playback;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -20,7 +21,7 @@ public final class WatchLook {
     }
 
     public static boolean isClassic(Context context) {
-        return prefs(context).getBoolean(KEY_CLASSIC, false);
+        return PrefCache.getBoolean(context, PREFS, KEY_CLASSIC, false);
     }
 
     public static void setClassic(Context context, boolean classic) {
@@ -29,7 +30,7 @@ public final class WatchLook {
 
     /** {@code button} is the layout id's name ("mobile_player_cast"). */
     public static boolean isShown(Context context, String button) {
-        return !prefs(context).getBoolean(KEY_HIDDEN + button, false);
+        return !PrefCache.getBoolean(context, PREFS, KEY_HIDDEN + button, false);
     }
 
     public static void setShown(Context context, String button, boolean shown) {

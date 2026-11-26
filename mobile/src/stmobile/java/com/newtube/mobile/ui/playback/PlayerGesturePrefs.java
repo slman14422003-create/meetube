@@ -1,5 +1,6 @@
 package com.newtube.mobile.ui.playback;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -33,7 +34,7 @@ public final class PlayerGesturePrefs {
      * the right for volume, each its own switch. Both start from the old shared one (KEY_LEVEL_SWIPES).
      */
     public static boolean isBrightnessSwipeOn(Context context) {
-        return prefs(context).getBoolean(KEY_BRIGHTNESS_SWIPE, levelSwipes(context));
+        return PrefCache.getBoolean(context, PREFS_NAME, KEY_BRIGHTNESS_SWIPE, levelSwipes(context));
     }
 
     public static void setBrightnessSwipeOn(Context context, boolean on) {
@@ -41,7 +42,7 @@ public final class PlayerGesturePrefs {
     }
 
     public static boolean isVolumeSwipeOn(Context context) {
-        return prefs(context).getBoolean(KEY_VOLUME_SWIPE, levelSwipes(context));
+        return PrefCache.getBoolean(context, PREFS_NAME, KEY_VOLUME_SWIPE, levelSwipes(context));
     }
 
     public static void setVolumeSwipeOn(Context context, boolean on) {
@@ -49,12 +50,12 @@ public final class PlayerGesturePrefs {
     }
 
     private static boolean levelSwipes(Context context) {
-        return prefs(context).getBoolean(KEY_LEVEL_SWIPES, true);
+        return PrefCache.getBoolean(context, PREFS_NAME, KEY_LEVEL_SWIPES, true);
     }
 
     /** Swipe sideways on the video to seek. */
     public static boolean isSeekSwipeOn(Context context) {
-        return prefs(context).getBoolean(KEY_SEEK_SWIPE, true);
+        return PrefCache.getBoolean(context, PREFS_NAME, KEY_SEEK_SWIPE, true);
     }
 
     public static void setSeekSwipeOn(Context context, boolean on) {

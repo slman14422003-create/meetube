@@ -333,12 +333,6 @@ public final class SettingsPages {
         card.findViewById(R.id.about_log).setOnClickListener(v -> DiagnosticLog.share(context));
         ((android.widget.TextView) card.findViewById(R.id.about_terminal)).setText(androidx.core.text.HtmlCompat.fromHtml(
                 context.getString(R.string.mobile_about_coffee_note), androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY));
-        // A view animation, not an animator: it only runs while the card is drawn.
-        android.view.animation.AlphaAnimation blink = new android.view.animation.AlphaAnimation(1f, 0f);
-        blink.setDuration(1060);
-        blink.setRepeatCount(android.view.animation.Animation.INFINITE);
-        blink.setInterpolator(t -> t < 0.5f ? 0f : 1f);
-        card.findViewById(R.id.about_cursor).startAnimation(blink);
         TiltParallax.attach((android.view.ViewGroup) card, card.findViewById(R.id.about_avatar), card.findViewById(R.id.about_name),
                 card.findViewById(R.id.about_handle), card.findViewById(R.id.about_terminal_box),
                 card.findViewById(R.id.about_coffee), card.findViewById(R.id.about_buttons));

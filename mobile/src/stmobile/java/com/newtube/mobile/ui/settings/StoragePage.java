@@ -283,6 +283,9 @@ final class StoragePage {
         private final int mRail;
         private final boolean mGlow;
         private final float mTarget;
+        private final int mGlowColor;
+        private final LinearGradient mFillShader;
+        private final android.graphics.Matrix mShaderMatrix = new android.graphics.Matrix();
         private float mShown;
 
         GlowBar(Context context, float fraction) {
@@ -292,6 +295,10 @@ final class StoragePage {
             mRail = ContextCompat.getColor(context, R.color.meetube_switch_off);
             mGlow = !NavLens.lowEnd(context);
             mTarget = Math.max(0f, Math.min(1f, fraction));
+            mGlowColor = ColorUtils.setAlphaComponent(mAccent, 0xAA);
+            mFillShader = new LinearGradient(0f, 0f, 1f, 0f,
+                    ColorUtils.blendARGB(mAccent, Color.BLACK, 0.12f), ColorUtils.blendARGB(mAccent, Color.WHITE, 0.35f),
+                    Shader.TileMode.CLAMP);
             if (mGlow && Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
                 setLayerType(LAYER_TYPE_SOFTWARE, null); // shadow layers on shapes need P+ in hardware
             }
@@ -338,13 +345,14 @@ final class StoragePage {
             mPaint.setStyle(Paint.Style.FILL);
             mPaint.setColor(mAccent);
             if (mGlow) {
-                mPaint.setShadowLayer(6 * mDp, 0, 0, ColorUtils.setAlphaComponent(mAccent, 0xAA));
+                mPaint.setShadowLayer(6 * mDp, 0, 0, mGlowColor);
                 canvas.drawRoundRect(mRect, r, r, mPaint);
                 mPaint.clearShadowLayer();
             }
-            mPaint.setShader(new LinearGradient(left, 0, end, 0,
-                    ColorUtils.blendARGB(mAccent, Color.BLACK, 0.12f), ColorUtils.blendARGB(mAccent, Color.WHITE, 0.35f),
-                    Shader.TileMode.CLAMP));
+            mShaderMatrix.setScale(Math.max(1e-3f, end - left), 1f);
+            mShaderMatrix.postTranslate(left, 0f);
+            mFillShader.setLocalMatrix(mShaderMatrix);
+            mPaint.setShader(mFillShader);
             canvas.drawRoundRect(mRect, r, r, mPaint);
             mPaint.setShader(null);
             // the sheen: a thin light line along the fill's upper half

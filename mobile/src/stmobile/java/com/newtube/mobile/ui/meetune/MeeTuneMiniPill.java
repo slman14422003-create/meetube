@@ -394,7 +394,7 @@ final class MeeTuneMiniPill {
             float cx = b.exactCenterX(), cy = b.exactCenterY();
             mOval.set(cx - r, cy - r, cx + r, cy + r);
             int rgb = mColor & 0x00FFFFFF;
-            if (mPulse > 0f && mPulse < 1f) {
+            if (mPulse > 0f && mPulse < 1f && r > 0f && b.width() > 0 && b.height() > 0) {
                 float fade = (1f - mPulse) * (1f - mPulse);
                 float edge = Math.min(b.width(), b.height()) / 2f;
                 float bloom = Math.min(edge, r * (0.55f + 0.75f * mPulse));

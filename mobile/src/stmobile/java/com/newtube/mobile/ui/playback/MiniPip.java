@@ -1,5 +1,6 @@
 package com.newtube.mobile.ui.playback;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.PictureInPictureParams;
@@ -80,7 +81,7 @@ public final class MiniPip {
      * opens PiP on purpose.
      */
     public static boolean isAutoEnabled(android.content.Context context) {
-        return context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE).getBoolean(KEY_AUTO, true);
+        return PrefCache.getBoolean(context, PREFS, KEY_AUTO, true);
     }
 
     public static void setAutoEnabled(android.content.Context context, boolean on) {

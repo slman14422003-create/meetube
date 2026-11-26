@@ -623,7 +623,7 @@ public class MobilePlaybackActivity extends MobileActivity
     /** MEETUNE: sound-only was switched on for a song, so the next plain video turns it back off. */
     private boolean mMeeTuneAudioOnly;
     /** MEETUBE(audio-only): the live session's state, for the mini card's headphones button. */
-    static volatile boolean sAudioOnly;
+    public static volatile boolean sAudioOnly;
     static final String EXTRA_AUDIO_TOGGLE = "toggle";
     /** MEETUBE(shorts): onStop paused the short (no background play); onStart plays it again. */
     private boolean mShortPausedByLeave;

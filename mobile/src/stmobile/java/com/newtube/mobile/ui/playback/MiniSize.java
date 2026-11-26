@@ -1,5 +1,6 @@
 package com.newtube.mobile.ui.playback;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -46,7 +47,7 @@ public final class MiniSize {
     }
 
     public static int type(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_TYPE, DEFAULT);
+        return PrefCache.getInt(context, PREFS, KEY_TYPE, DEFAULT);
     }
 
     public static void setType(Context context, int type) {
@@ -59,7 +60,7 @@ public final class MiniSize {
     }
 
     public static int percent(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY, 100);
+        return PrefCache.getInt(context, PREFS, KEY, 100);
     }
 
     public static void setPercent(Context context, int percent) {

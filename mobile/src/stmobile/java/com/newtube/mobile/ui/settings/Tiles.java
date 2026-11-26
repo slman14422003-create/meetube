@@ -521,6 +521,26 @@ final class Tiles {
      * or a list on it (in a given theme's colours), or a thumbnail with where its frame comes from.
      */
     private static final class Picture extends Drawable {
+        private final RectF mR_bar = new RectF();
+        private final RectF mR_brand = new RectF();
+        private final RectF mR_card = new RectF();
+        private final RectF mR_page = new RectF();
+        private final RectF mR_phone = new RectF();
+        private final RectF mR_pic = new RectF();
+        private final RectF mR_screen = new RectF();
+        private final RectF mR_seek = new RectF();
+        private final RectF mR_t = new RectF();
+        private final RectF mR_thumb = new RectF();
+        private final RectF mBoundsF = new RectF();
+        private final Path mHills = new Path();
+        private final Path mTriPath = new Path();
+        private static final int[] STRIPE_COLORS = {0xFFFF453A, 0xFFFFB300, 0xFF0A84FF};
+        private final android.graphics.Matrix mShaderMatrix = new android.graphics.Matrix();
+        private android.graphics.SweepGradient mSweep;
+        private android.graphics.LinearGradient mTypingShader;
+        private android.graphics.RadialGradient mGlowShader;
+        private int mGlowShaderColor;
+
         private static final int ACCENT = 0xFFFF453A;
         private final int mKind;
         private final int mScreen;
@@ -599,16 +619,19 @@ final class Tiles {
                 return; // the loops below step by the height
             }
             if (mKind >= THUMB_DEFAULT && mKind <= THUMB_END || mKind == FX_WATCHED) {
-                thumbnail(canvas, new RectF(b));
+                mBoundsF.set(b);
+                thumbnail(canvas, mBoundsF);
                 return;
             }
             if (mKind >= GLOW_WHITE) {
-                scene(canvas, new RectF(b));
+                mBoundsF.set(b);
+                scene(canvas, mBoundsF);
                 return;
             }
             float h = b.height();
             float w = Math.min(b.width(), h * 0.58f);
-            RectF phone = new RectF(b.exactCenterX() - w / 2, b.top, b.exactCenterX() + w / 2, b.bottom);
+            RectF phone = mR_phone;
+            phone.set(b.exactCenterX() - w / 2, b.top, b.exactCenterX() + w / 2, b.bottom);
             if (mKind == THEME_SYSTEM) {
                 // Half light, half dark, cut on the diagonal.
                 phone(canvas, phone, THEME_LIGHT, 0xFFFFFFFF, 0xFFE3E3E3, 0xFFCFCFCF);
@@ -794,7 +817,8 @@ final class Tiles {
                 case GLOW_TABS:
                 case GLOW_ACCENT:
                 case GLOW_OFF: {
-                    RectF bar = new RectF(b.left, cy - h * 0.22f, b.right, cy + h * 0.22f);
+                    RectF bar = mR_bar;
+                    bar.set(b.left, cy - h * 0.22f, b.right, cy + h * 0.22f);
                     pill(canvas, bar.left, bar.top, bar.right, bar.bottom, mBlock);
                     int glow = mKind == GLOW_WHITE ? (mInk == 0xFF303030 ? 0xFF8E8E93 : mInk) : // grey on light, as NavBloom
                              mKind == GLOW_TABS ? TAB_COLORS[0] : ACCENT;
@@ -809,7 +833,8 @@ final class Tiles {
                     break;
                 }
                 case FX_LABELS: {
-                    RectF bar = new RectF(b.left, cy - h * 0.3f, b.right, cy + h * 0.3f);
+                    RectF bar = mR_bar;
+                    bar.set(b.left, cy - h * 0.3f, b.right, cy + h * 0.3f);
                     pill(canvas, bar.left, bar.top, bar.right, bar.bottom, mBlock);
                     float dot = bar.height() * 0.13f;
                     for (int i = 0; i < 4; i++) {
@@ -822,7 +847,8 @@ final class Tiles {
                     break;
                 }
                 case YOUTUBE_MODE: {
-                    RectF screen = new RectF(b.left + h * 0.08f, b.top + h * 0.08f, b.right - h * 0.08f, b.bottom - h * 0.08f);
+                    RectF screen = mR_screen;
+                    screen.set(b.left + h * 0.08f, b.top + h * 0.08f, b.right - h * 0.08f, b.bottom - h * 0.08f);
                     float round = h * 0.16f;
                     canvas.save();
                     mPath.reset();
@@ -861,7 +887,8 @@ final class Tiles {
                 }
                 case FX_TOP_BAR: {
                     // A feed under the top bar's two pills, kept on screen.
-                    RectF screen = new RectF(b.left + h * 0.08f, b.top + h * 0.08f, b.right - h * 0.08f, b.bottom - h * 0.08f);
+                    RectF screen = mR_screen;
+                    screen.set(b.left + h * 0.08f, b.top + h * 0.08f, b.right - h * 0.08f, b.bottom - h * 0.08f);
                     mPaint.setColor(mScreen);
                     canvas.drawRoundRect(screen, h * 0.16f, h * 0.16f, mPaint);
                     float in = h * 0.12f;
@@ -885,7 +912,8 @@ final class Tiles {
                     // bar, a frosted pill, or nothing (a struck-out card).
                     float corner = h * 0.14f;
                     float pw = Math.min(w, h * 1.5f);
-                    RectF page = new RectF(cx - pw / 2, b.top, cx + pw / 2, b.bottom);
+                    RectF page = mR_page;
+                    page.set(cx - pw / 2, b.top, cx + pw / 2, b.bottom);
                     mPaint.setColor(mScreen);
                     canvas.drawRoundRect(page, corner, corner, mPaint);
                     float pad = h * 0.1f;
@@ -894,7 +922,8 @@ final class Tiles {
                     float bottom = page.bottom - pad * 0.7f;
                     if (mKind == MINI_DEFAULT || mKind == MINI_OFF) {
                         float cw = pw * 0.44f;
-                        RectF card = new RectF(page.right - pad * 0.7f - cw, bottom - cw * 9f / 16f, page.right - pad * 0.7f, bottom);
+                        RectF card = mR_card;
+                        card.set(page.right - pad * 0.7f - cw, bottom - cw * 9f / 16f, page.right - pad * 0.7f, bottom);
                         if (mKind == MINI_OFF) {
                             mPaint.setStyle(Paint.Style.STROKE);
                             mPaint.setStrokeWidth(Math.max(1f, h * 0.025f));
@@ -911,7 +940,8 @@ final class Tiles {
                         break;
                     }
                     float bh = h * 0.26f;
-                    RectF bar = new RectF(page.left + pad * 0.5f, bottom - bh, page.right - pad * 0.5f, bottom);
+                    RectF bar = mR_bar;
+                    bar.set(page.left + pad * 0.5f, bottom - bh, page.right - pad * 0.5f, bottom);
                     boolean frost = mKind == MINI_MINIMAL2;
                     if (frost) {
                         mPaint.setColor(0x993A3A44);
@@ -931,11 +961,13 @@ final class Tiles {
                     float textRight;
                     RectF pic;
                     if (frost) { // the picture first, then the title
-                        pic = new RectF(bar.left + bh * 0.3f, bar.top + in, bar.left + bh * 0.3f + vw, bar.bottom - in);
+                        pic = mR_pic;
+                        pic.set(bar.left + bh * 0.3f, bar.top + in, bar.left + bh * 0.3f + vw, bar.bottom - in);
                         textLeft = pic.right + in;
                         textRight = bar.right - bh * 1.5f;
                     } else { // MEETUBE(issue #226): the bar is the video, the title over it
-                        pic = new RectF(bar);
+                        pic = mR_pic;
+                        pic.set(bar);
                         textLeft = bar.left + in * 2;
                         textRight = bar.right - bh * 1.5f;
                     }
@@ -977,7 +1009,8 @@ final class Tiles {
                 }
                 case FX_BRAND_NAME: {
                     float ph = h * 0.44f;
-                    RectF brand = new RectF(cx - ph * 1.8f, cy - ph / 2, cx + ph * 1.8f, cy + ph / 2);
+                    RectF brand = mR_brand;
+                    brand.set(cx - ph * 1.8f, cy - ph / 2, cx + ph * 1.8f, cy + ph / 2);
                     pill(canvas, brand.left, brand.top, brand.right, brand.bottom, mBlock);
                     float icon = brand.left + ph * 0.5f;
                     mPaint.setColor(ACCENT);
@@ -986,7 +1019,8 @@ final class Tiles {
                     break;
                 }
                 case FX_BADGES: {
-                    RectF thumb = new RectF(b.left, b.top + h * 0.02f, b.right, b.top + h * 0.76f);
+                    RectF thumb = mR_thumb;
+                    thumb.set(b.left, b.top + h * 0.02f, b.right, b.top + h * 0.76f);
                     video(canvas, thumb, h * 0.1f);
                     float top = b.top + h * 0.43f;
                     float bottom = top + h * 0.25f;
@@ -1104,7 +1138,8 @@ final class Tiles {
                         canvas.restore();
                         break;
                     }
-                    RectF seek = new RectF(b.left + w * 0.68f, b.top + h * 0.24f,
+                    RectF seek = mR_seek;
+                    seek.set(b.left + w * 0.68f, b.top + h * 0.24f,
                             b.right - w * 0.04f, b.bottom - h * 0.24f);
                     pill(canvas, seek.left, seek.top, seek.right, seek.bottom, mBlock);
                     mPaint.setStyle(Paint.Style.STROKE);
@@ -1141,7 +1176,8 @@ final class Tiles {
                         canvas.drawCircle(head, cy, h * 0.12f, mPaint);
                     } else {
                         float half = h * 0.24f;
-                        RectF thumb = new RectF(head - half, cy - half, head + half, cy + half);
+                        RectF thumb = mR_thumb;
+                        thumb.set(head - half, cy - half, head + half, cy + half);
                         video(canvas, thumb, h * 0.08f);
                         mPaint.setColor(ACCENT);
                         mPaint.setStyle(Paint.Style.STROKE);
@@ -1152,7 +1188,8 @@ final class Tiles {
                     break;
                 }
                 case FX_MOTION: {
-                    RectF bar = new RectF(b.left, cy - h * 0.22f, b.right, cy + h * 0.22f);
+                    RectF bar = mR_bar;
+                    bar.set(b.left, cy - h * 0.22f, b.right, cy + h * 0.22f);
                     pill(canvas, bar.left, bar.top, bar.right, bar.bottom, mBlock);
                     for (int i = 0; i < 4; i++) {
                         mPaint.setColor(mLine);
@@ -1174,7 +1211,8 @@ final class Tiles {
                 case FX_GLASS: {
                     // Thumbnails scrolling under the bar; the lens magnifies them.
                     float barTop = cy + h * 0.02f;
-                    RectF bar = new RectF(b.left, barTop, b.right, barTop + h * 0.4f);
+                    RectF bar = mR_bar;
+                    bar.set(b.left, barTop, b.right, barTop + h * 0.4f);
                     stripes(canvas, b);
                     pill(canvas, bar.left, bar.top, bar.right, bar.bottom, (mScreen & 0x00FFFFFF) | 0x66000000);
                     float lx = bar.left + bar.width() * 0.3f;
@@ -1208,7 +1246,8 @@ final class Tiles {
                     mPaint.setColor(0xFFFFB300);
                     canvas.drawCircle(b.left + w * 0.78f, b.top + h * 0.28f, h * 0.14f, mPaint);
                     mPaint.setColor(0xFF3A4060);
-                    Path hills = new Path();
+                    Path hills = mHills;
+            hills.reset();
                     hills.moveTo(b.left, b.bottom);
                     hills.lineTo(b.left + w * 0.3f, b.top + h * 0.45f);
                     hills.lineTo(b.left + w * 0.55f, b.top + h * 0.7f);
@@ -1256,11 +1295,17 @@ final class Tiles {
                 }
                 case FX_SEARCH: {
                     // The screen's edge alight in Siri's colours, Search's bar at the top.
-                    RectF screen = new RectF(b.left + h * 0.08f, b.top + h * 0.08f, b.right - h * 0.08f, b.bottom - h * 0.08f);
+                    RectF screen = mR_screen;
+                    screen.set(b.left + h * 0.08f, b.top + h * 0.08f, b.right - h * 0.08f, b.bottom - h * 0.08f);
                     float corner = h * 0.16f;
                     mPaint.setColor(mScreen);
                     canvas.drawRoundRect(screen, corner, corner, mPaint);
-                    mPaint.setShader(new android.graphics.SweepGradient(cx, cy, SIRI, null));
+                    if (mSweep == null) {
+                        mSweep = new android.graphics.SweepGradient(0f, 0f, SIRI, null);
+                    }
+                    mShaderMatrix.setTranslate(cx, cy);
+                    mSweep.setLocalMatrix(mShaderMatrix);
+                    mPaint.setShader(mSweep);
                     mPaint.setStyle(Paint.Style.STROKE);
                     mPaint.setStrokeWidth(h * 0.1f);
                     mPaint.setAlpha(0x66);
@@ -1282,8 +1327,14 @@ final class Tiles {
                     magnifier(canvas, b.left + (bottom - top) * 0.55f, cy, glass, mInk);
                     float textLeft = b.left + (bottom - top) * 1.05f;
                     float textRight = b.right - w * 0.22f;
-                    mPaint.setShader(new android.graphics.LinearGradient(textLeft, 0, textRight, 0, SIRI, null,
-                            android.graphics.Shader.TileMode.CLAMP));
+                    if (mTypingShader == null) {
+                        mTypingShader = new android.graphics.LinearGradient(0f, 0f, 1f, 0f, SIRI, null,
+                                android.graphics.Shader.TileMode.CLAMP);
+                    }
+                    mShaderMatrix.setScale(Math.max(1e-3f, textRight - textLeft), 1f);
+                    mShaderMatrix.postTranslate(textLeft, 0f);
+                    mTypingShader.setLocalMatrix(mShaderMatrix);
+                    mPaint.setShader(mTypingShader);
                     mRect.set(textLeft, cy - h * 0.06f, textRight, cy + h * 0.06f);
                     canvas.drawRoundRect(mRect, h * 0.06f, h * 0.06f, mPaint);
                     mPaint.setShader(null);
@@ -1335,7 +1386,7 @@ final class Tiles {
 
         /** Three thumbnails side by side (Liquid glass's picture draws them twice: plain and magnified). */
         private void stripes(Canvas canvas, RectF b) {
-            int[] colors = {0xFFFF453A, 0xFFFFB300, 0xFF0A84FF};
+            int[] colors = STRIPE_COLORS;
             float gap = b.width() * 0.04f;
             float cell = (b.width() - gap * 2) / 3;
             for (int i = 0; i < 3; i++) {
@@ -1345,9 +1396,19 @@ final class Tiles {
         }
 
         private void glow(Canvas canvas, float cx, float cy, float radius, int color) {
-            mPaint.setShader(new android.graphics.RadialGradient(cx, cy, radius,
-                    new int[] {(color & 0x00FFFFFF) | 0xA0000000, color & 0x00FFFFFF}, null,
-                    android.graphics.Shader.TileMode.CLAMP));
+            if (radius <= 0f) {
+                return;
+            }
+            if (mGlowShader == null || mGlowShaderColor != color) {
+                mGlowShader = new android.graphics.RadialGradient(0f, 0f, 1f,
+                        new int[] {(color & 0x00FFFFFF) | 0xA0000000, color & 0x00FFFFFF}, null,
+                        android.graphics.Shader.TileMode.CLAMP);
+                mGlowShaderColor = color;
+            }
+            mShaderMatrix.setScale(radius, radius);
+            mShaderMatrix.postTranslate(cx, cy);
+            mGlowShader.setLocalMatrix(mShaderMatrix);
+            mPaint.setShader(mGlowShader);
             canvas.drawCircle(cx, cy, radius, mPaint);
             mPaint.setShader(null);
         }
@@ -1369,7 +1430,8 @@ final class Tiles {
         /** A play-style triangle, pointing right ({@code direction} 1) or left (-1). */
         private void triangle(Canvas canvas, float cx, float cy, float size, int direction, int color) {
             mPaint.setColor(color);
-            Path path = new Path();
+            Path path = mTriPath;
+            path.reset();
             path.moveTo(cx - size * 0.7f * direction, cy - size);
             path.lineTo(cx + size * direction, cy);
             path.lineTo(cx - size * 0.7f * direction, cy + size);
@@ -1389,7 +1451,8 @@ final class Tiles {
             mPaint.setColor(0xFFFFB300);
             canvas.drawCircle(r.left + r.width() * 0.75f, r.top + r.height() * 0.3f, r.height() * 0.14f, mPaint);
             mPaint.setColor(0xFF3A4060);
-            Path hills = new Path();
+            Path hills = mHills;
+            hills.reset();
             hills.moveTo(r.left, r.bottom);
             hills.lineTo(r.left + r.width() * 0.35f, r.top + r.height() * 0.45f);
             hills.lineTo(r.left + r.width() * 0.6f, r.top + r.height() * 0.7f);
@@ -1410,7 +1473,8 @@ final class Tiles {
         /** A landscape thumbnail: hills under a sun, and where along the video its frame is from. */
         private void thumbnail(Canvas canvas, RectF b) {
             float h = Math.min(b.height(), b.width() * 0.5625f);
-            RectF t = new RectF(b.left, b.centerY() - h / 2, b.right, b.centerY() + h / 2);
+            RectF t = mR_t;
+            t.set(b.left, b.centerY() - h / 2, b.right, b.centerY() + h / 2);
             float corner = h * 0.14f;
             mPath.reset();
             mPath.addRoundRect(t, corner, corner, Path.Direction.CW);
@@ -1423,7 +1487,8 @@ final class Tiles {
             mPaint.setColor(0xFFFFB300);
             canvas.drawCircle(t.left + t.width() * position, t.top + h * 0.3f, h * 0.13f, mPaint);
             mPaint.setColor(mLine);
-            Path hills = new Path();
+            Path hills = mHills;
+            hills.reset();
             hills.moveTo(t.left, t.bottom);
             hills.lineTo(t.left + t.width() * 0.3f, t.top + h * 0.5f);
             hills.lineTo(t.left + t.width() * 0.5f, t.top + h * 0.7f);

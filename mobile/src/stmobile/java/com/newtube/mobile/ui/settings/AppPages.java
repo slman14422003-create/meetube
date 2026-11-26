@@ -489,6 +489,19 @@ final class AppPages {
                 () -> com.newtube.mobile.ui.common.Glass.isLiquid(context),
                 on -> com.newtube.mobile.ui.common.Glass.setLiquid(context, on)).needsRestart(), Tiles.FX_GLASS));
 
+        rows.add(SettingsRow.<Integer>choice(context.getString(R.string.mobile_settings_glass_quality))
+                .option(context.getString(R.string.mobile_settings_glass_quality_full),
+                        context.getString(R.string.mobile_settings_glass_quality_full_desc),
+                        com.newtube.mobile.ui.common.Glass.QUALITY_FULL)
+                .option(context.getString(R.string.mobile_settings_glass_quality_light),
+                        context.getString(R.string.mobile_settings_glass_quality_light_desc),
+                        com.newtube.mobile.ui.common.Glass.QUALITY_LIGHT)
+                .option(context.getString(R.string.mobile_settings_glass_quality_flat),
+                        context.getString(R.string.mobile_settings_glass_quality_flat_desc),
+                        com.newtube.mobile.ui.common.Glass.QUALITY_FLAT)
+                .bind(() -> com.newtube.mobile.ui.common.Glass.quality(context),
+                        q -> com.newtube.mobile.ui.common.Glass.setQuality(context, q)));
+
         // MEETUBE(progress glow): the light at the head of the seek bar and the cards' watched line.
         rows.add(Tiles.toggle(SettingsRow.toggle(context.getString(R.string.mobile_settings_progress_glow),
                 context.getString(R.string.mobile_settings_progress_glow_summary),

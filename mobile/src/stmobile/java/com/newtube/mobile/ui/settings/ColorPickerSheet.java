@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ComposeShader;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -217,7 +215,12 @@ final class ColorPickerSheet {
         private final float mDp;
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Thumb mThumb;
-        private int mShaderHue = -1;
+        private final Paint mOverlay = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private LinearGradient mWhiteFade;
+        private LinearGradient mBlackFade;
+        private int mPure = Color.RED;
+        private int mPureHue = -1;
+        private final float[] mPureHsv = {0f, 1f, 1f};
         Runnable onChange;
 
         SvSquare(Context context, float[] hsv, float dp) {
@@ -231,15 +234,23 @@ final class ColorPickerSheet {
         protected void onDraw(Canvas canvas) {
             int w = getWidth();
             int h = getHeight();
-            if (mShaderHue != (int) mHsv[0] || mPaint.getShader() == null) {
-                mShaderHue = (int) mHsv[0];
-                int pure = Color.HSVToColor(new float[] {mHsv[0], 1, 1});
-                mPaint.setShader(new ComposeShader(
-                        new LinearGradient(0, 0, w, 0, Color.WHITE, pure, Shader.TileMode.CLAMP),
-                        new LinearGradient(0, 0, 0, h, Color.WHITE, Color.BLACK, Shader.TileMode.CLAMP),
-                        PorterDuff.Mode.MULTIPLY));
+            if (mWhiteFade == null) {
+                mWhiteFade = new LinearGradient(0, 0, w, 0, Color.WHITE, Color.TRANSPARENT, Shader.TileMode.CLAMP);
+                mBlackFade = new LinearGradient(0, 0, 0, h, Color.TRANSPARENT, Color.BLACK, Shader.TileMode.CLAMP);
             }
-            canvas.drawRoundRect(0, 0, w, h, 20 * mDp, 20 * mDp, mPaint);
+            if (mPureHue != (int) mHsv[0]) {
+                mPureHue = (int) mHsv[0];
+                mPureHsv[0] = mHsv[0];
+                mPure = Color.HSVToColor(mPureHsv);
+            }
+            float corner = 20 * mDp;
+            mPaint.setShader(null);
+            mPaint.setColor(mPure);
+            canvas.drawRoundRect(0, 0, w, h, corner, corner, mPaint);
+            mOverlay.setShader(mWhiteFade);
+            canvas.drawRoundRect(0, 0, w, h, corner, corner, mOverlay);
+            mOverlay.setShader(mBlackFade);
+            canvas.drawRoundRect(0, 0, w, h, corner, corner, mOverlay);
             float inset = 4 * mDp; // the thumb stays inside the rounded corners
             mThumb.draw(canvas, inset + mHsv[1] * (w - 2 * inset), inset + (1 - mHsv[2]) * (h - 2 * inset),
                     Color.HSVToColor(mHsv));
@@ -247,7 +258,8 @@ final class ColorPickerSheet {
 
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-            mPaint.setShader(null);
+            mWhiteFade = null;
+            mBlackFade = null;
         }
 
         @SuppressLint("ClickableViewAccessibility")

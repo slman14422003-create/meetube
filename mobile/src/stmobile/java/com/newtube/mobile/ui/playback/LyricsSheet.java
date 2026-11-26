@@ -298,9 +298,41 @@ final class LyricsSheet {
                 lines.postDelayed(this, TICK_MS);
             }
         };
+        android.view.ViewTreeObserver.OnWindowFocusChangeListener focus = has -> {
+            lines.removeCallbacks(follow);
+            if (has) {
+                lines.post(follow);
+            }
+        };
+        View.OnAttachStateChangeListener attach = new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                v.getViewTreeObserver().addOnWindowFocusChangeListener(focus);
+                v.removeCallbacks(follow);
+                if (v.hasWindowFocus()) {
+                    v.post(follow);
+                }
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                if (v.getViewTreeObserver().isAlive()) {
+                    v.getViewTreeObserver().removeOnWindowFocusChangeListener(focus);
+                }
+                v.removeCallbacks(follow);
+            }
+        };
+        lines.addOnAttachStateChangeListener(attach);
+        if (lines.isAttachedToWindow()) {
+            lines.getViewTreeObserver().addOnWindowFocusChangeListener(focus);
+        }
         lines.post(follow);
         return () -> {
             lines.removeCallbacks(follow);
+            lines.removeOnAttachStateChangeListener(attach);
+            if (lines.getViewTreeObserver().isAlive()) {
+                lines.getViewTreeObserver().removeOnWindowFocusChangeListener(focus);
+            }
             scroll.setOnTouchListener(null);
         };
     }

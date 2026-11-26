@@ -1,5 +1,6 @@
 package com.newtube.mobile.ui.playback;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -182,6 +183,7 @@ public class PlayerTimeBar extends View implements TimeBar {
     private boolean mDotHidden;
     /** MEETUBE(seek thumb): the user's picture in place of the dot, or null. */
     @Nullable private android.graphics.drawable.Drawable mThumb;
+    @Nullable private SeekThumb.Request mThumbRequest;
     private long mScrubPosition;
     /** Where playback was when the drag began: the cancel spot. */
     private long mScrubOrigin;
@@ -272,7 +274,7 @@ public class PlayerTimeBar extends View implements TimeBar {
 
     /** MEETUBE(issue #200): Settings > Customize can turn the portrait line off; on by default. */
     public static boolean isLineOn(Context context) {
-        return context.getSharedPreferences("meetube_app", Context.MODE_PRIVATE).getBoolean("seek_line", true);
+        return PrefCache.getBoolean(context, "meetube_app", "seek_line", true);
     }
 
     public static void setLineOn(Context context, boolean on) {
@@ -1098,10 +1100,16 @@ public class PlayerTimeBar extends View implements TimeBar {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mThumb = SeekThumb.load(getContext()); // picked up again each time the player opens
-        if (mThumb != null) {
-            mThumb.setCallback(this);
-        }
+        // Picked up again each time the player opens; decoded off the main thread, the dot until then.
+        mThumbRequest = SeekThumb.loadAsync(getContext(), drawable -> {
+            mThumbRequest = null;
+            if (drawable == null || !isAttachedToWindow()) {
+                return;
+            }
+            mThumb = drawable;
+            drawable.setCallback(this);
+            invalidate();
+        });
     }
 
     @Override
@@ -1112,6 +1120,10 @@ public class PlayerTimeBar extends View implements TimeBar {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        if (mThumbRequest != null) {
+            mThumbRequest.cancel();
+            mThumbRequest = null;
+        }
         if (mThumb != null) {
             mThumb.setCallback(null);
             if (mThumb instanceof android.graphics.drawable.Animatable) {

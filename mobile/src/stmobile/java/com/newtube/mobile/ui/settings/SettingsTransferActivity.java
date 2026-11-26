@@ -232,7 +232,8 @@ public final class SettingsTransferActivity extends LocalizedPickerActivity {
                         default: break;
                     }
                 }
-                editor.commit(); // on disk before the restart
+                editor.apply(); // reaches the disk during the beat before the restart
+                com.newtube.mobile.ui.common.PrefCache.invalidate(name);
             }
         }
         String icon = root.optString("app_icon", null);

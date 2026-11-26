@@ -1,5 +1,6 @@
 package com.newtube.mobile.ui.playback;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -68,8 +69,8 @@ public final class AmbientGlow implements Runnable {
 
     /** Until the user sets it: on in the dark theme, off in the light one (a glow on a white page). */
     public static boolean isOn(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_ON,
-                !com.newtube.mobile.ui.common.ThemeMode.isLight(context));
+        return PrefCache.has(context, PREFS, KEY_ON) ? PrefCache.getBoolean(context, PREFS, KEY_ON, true)
+                : !com.newtube.mobile.ui.common.ThemeMode.isLight(context);
     }
 
     public static void setOn(Context context, boolean on) {

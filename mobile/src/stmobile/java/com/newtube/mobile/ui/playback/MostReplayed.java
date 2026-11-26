@@ -1,5 +1,6 @@
 package com.newtube.mobile.ui.playback;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.content.Context;
 import android.util.Log;
 import android.util.LruCache;
@@ -31,7 +32,7 @@ public final class MostReplayed {
     }
 
     public static boolean isOn(Context context) {
-        return context.getSharedPreferences("meetube_app", Context.MODE_PRIVATE).getBoolean("most_replayed", true);
+        return PrefCache.getBoolean(context, "meetube_app", "most_replayed", true);
     }
 
     public static void setOn(Context context, boolean on) {

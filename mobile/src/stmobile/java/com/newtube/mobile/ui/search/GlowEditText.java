@@ -78,8 +78,24 @@ public class GlowEditText extends AppCompatEditText {
                 mPhase = a.getAnimatedFraction();
                 applyGlow();
             });
-            mSweep.start();
         }
+        syncSweep();
+    }
+
+    private void syncSweep() {
+        com.newtube.mobile.ui.common.AnimGate.sync(mSweep, com.newtube.mobile.ui.common.AnimGate.shouldRun(this));
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+        syncSweep();
+    }
+
+    @Override
+    public void onVisibilityAggregated(boolean isVisible) {
+        super.onVisibilityAggregated(isVisible);
+        syncSweep();
     }
 
     private void fadeTo(float target) {
