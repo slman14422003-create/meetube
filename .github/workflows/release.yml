@@ -2,7 +2,10 @@
 # - Push a tag vX.Y.Z (matching build.gradle's stmobile versionName "X.Y.Z Name" and the top
 #   CHANGELOG.md entry): publishes the GitHub release "MeeTube X.Y.Z Name" with the APKs and
 #   meetube.json for the in-app updater. Its notes are a download table, then the changelog entry.
-# - Run it by hand (Actions > Release > Run workflow): builds and keeps the APKs as artifacts only.
+# - Run it by hand (Actions > Release > Run workflow): type the version you want (for example
+#   "3.7.0 Nova"; the code is worked out from the number unless you give one). It builds with that
+#   version and keeps the APKs as artifacts; tick "publish" to also create the GitHub release
+#   vX.Y.Z (no meetube.json, so the in-app updater is untouched).
 # Secrets: SIGNING_KEY (the .jks, base64), KEY_STORE_PASSWORD, ALIAS, KEY_PASSWORD. Every release
 # must use the same key or installed apps refuse the update.
 name: Release
@@ -11,6 +14,20 @@ on:
   push:
     tags: [ "v*" ]
   workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version, e.g. "3.7.0 Nova" (empty = keep build.gradle as is)'
+        required: false
+        type: string
+      version_code:
+        description: 'Version code (empty = worked out from the number: 3.7.0 -> 30700)'
+        required: false
+        type: string
+      publish:
+        description: 'Also publish a GitHub release with this version'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -30,6 +47,31 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: 'gradle'
+
+      - name: Set version
+        if: github.event_name == 'workflow_dispatch' && inputs.version_name != ''
+        env:
+          VERSION_NAME: ${{ inputs.version_name }}
+          VERSION_CODE: ${{ inputs.version_code }}
+        run: |
+          python3 - <<'PY'
+          import os, re, sys
+          name = os.environ["VERSION_NAME"].strip()
+          m = re.match(r"^(\d+)\.(\d+)\.(\d+)(\s.+)?$", name)
+          if not m:
+              sys.exit("::error::version must look like 3.7.0 or 3.7.0 Nova")
+          code = os.environ.get("VERSION_CODE", "").strip() or str(int(m[1]) * 10000 + int(m[2]) * 100 + int(m[3]))
+          path = "mobile/build.gradle"
+          text = open(path, encoding="utf-8").read()
+          # the stmobile flavor's lines are the last ones in the file
+          i = text.rindex("versionCode ")
+          j = text.rindex("versionName ")
+          head, tail = text[:i], text[i:]
+          tail = re.sub(r"versionCode \d+", "versionCode " + code, tail, count=1)
+          tail = re.sub(r'versionName "[^"]*"', 'versionName "' + name + '"', tail, count=1)
+          open(path, "w", encoding="utf-8").write(head + tail)
+          print("version set to", name, code)
+          PY
 
       - name: Signing key
         env:
@@ -70,17 +112,26 @@ jobs:
           if-no-files-found: error
 
       - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish)
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
+          REF_TAG: ${{ github.ref_name }}
           NAME: ${{ steps.meta.outputs.name }}
+          MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          # Fails unless the tag, build.gradle and CHANGELOG.md agree on the version.
-          python3 tools/update_manifest.py --tag "$TAG" --dist dist --out dist/meetube.json
+          if [ "$MANUAL" = "true" ]; then
+            TAG="v${NAME%% *}"
+          else
+            TAG="$REF_TAG"
+            # Fails unless the tag, build.gradle and CHANGELOG.md agree on the version.
+            python3 tools/update_manifest.py --tag "$TAG" --dist dist --out dist/meetube.json
+          fi
           # Release notes: which APK to pick, then this version's CHANGELOG.md section without its heading.
           awk -v h="## $NAME" '$0 == h {on=1; next} on && /^## / {exit} on' CHANGELOG.md > changes.md
-          test -s changes.md
+          if [ ! -s changes.md ]; then
+            [ "$MANUAL" = "true" ] || { echo "::error::no CHANGELOG.md section for $NAME"; exit 1; }
+            echo "Manual build of $NAME." > changes.md
+          fi
           url="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/MeeTube_${TAG#v}"
           # MeeTube TV ships from yashoncode/meetube-tv under tv-vX.Y.Z tags: the newest non-beta one's universal APK.
           tv_repo=yashoncode/meetube-tv
