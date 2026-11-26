@@ -148,3 +148,14 @@
     public static ** valueOf(java.lang.String);
     public static ** forNumber(int);
 }
+
+# dnsjava (org.xbill.DNS) references desktop-only classes (JNA for Windows, JNDI, Lombok, the
+# JDK name-service SPI). They never exist on Android and are never reached there, so R8's
+# "missing classes" check must not fail the release build.
+-dontwarn com.sun.jna.**
+-dontwarn javax.naming.**
+-dontwarn lombok.**
+-dontwarn java.net.spi.**
+-dontwarn sun.net.spi.nameservice.**
+-dontwarn org.xbill.DNS.spi.**
+-dontwarn org.slf4j.**
