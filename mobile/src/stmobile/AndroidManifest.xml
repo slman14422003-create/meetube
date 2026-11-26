@@ -106,6 +106,7 @@
     <application
         android:name="com.newtube.mobile.MobileMainApplication"
         android:banner="@drawable/meetube_tv_banner"
+        android:supportsRtl="true"
         android:theme="@style/Theme.NewTube"
         tools:replace="android:name,android:theme">
 

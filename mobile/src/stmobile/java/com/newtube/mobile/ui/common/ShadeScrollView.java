@@ -13,10 +13,12 @@ import android.widget.HorizontalScrollView;
 public class ShadeScrollView extends HorizontalScrollView {
     public ShadeScrollView(Context context) {
         super(context);
+        setLayoutDirection(LAYOUT_DIRECTION_LTR);
     }
 
     public ShadeScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setLayoutDirection(LAYOUT_DIRECTION_LTR);
     }
 
     @Override

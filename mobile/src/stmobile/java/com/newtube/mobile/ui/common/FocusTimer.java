@@ -143,7 +143,7 @@ public final class FocusTimer {
         float dp = context.getResources().getDisplayMetrics().density;
         if (blur) {
             android.graphics.drawable.GradientDrawable card = new android.graphics.drawable.GradientDrawable();
-            card.setCornerRadius(28 * dp);
+            card.setCornerRadius(18 * dp);
             // MEETUBE(glass): the grey surface at 72% washed the blurred page out to milk on the dark
             // theme; a black tint keeps it dark glass, as the search bar.
             card.setColor(androidx.core.content.ContextCompat.getColor(context, R.color.meetube_dialog_glass_tint));

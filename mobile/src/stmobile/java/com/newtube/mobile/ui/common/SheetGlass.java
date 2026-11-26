@@ -47,9 +47,9 @@ public final class SheetGlass {
     /** The copy is this many times smaller than the page; scaling it back up adds to the blur. */
     private static final int SCALE = 8;
     private static final int BLUR_RADIUS = 3;
-    private static final float CORNER_DP = 28f;
+    private static final float CORNER_DP = 18f;
     /** A live sheet's copies: about the frame rate of most videos. */
-    private static final long LIVE_FRAME_MS = 33;
+    private static final long LIVE_FRAME_MS = 50;
     /**
      * A live copy's GPU blur, in page pixels: as soft as {@link #blur} makes a 1/8 copy (three box
      * passes of radius 3 are a sigma of 3.5 there, 28 on the page; RenderEffect's radius r is a sigma
@@ -134,7 +134,7 @@ public final class SheetGlass {
             sheet.setClipChildren(false);
             // Live only for a sheet in its own window: a copy of a page holding the sheet would
             // blur the sheet into itself.
-            boolean live = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+            boolean live = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !BatterySaver.lite()
                     && sLivePage != null && sLivePage.isInstance(activity);
             frost(sheet.getChildAt(0), activity.getWindow(), sheet,
                     rounded ? CORNER_DP * sheet.getResources().getDisplayMetrics().density : 0f, live);
@@ -144,7 +144,7 @@ public final class SheetGlass {
     /**
      * MEETUBE(glass): an alert dialog on the sheets' glass instead of its flat surface: the window
      * keeps the Material background's insets (where the card sits) but paints nothing, and the
-     * card itself (parentPanel) takes the blurred page, rounded like the Material shape (28dp).
+     * card itself (parentPanel) takes the blurred page, rounded like the Material shape (18dp).
      */
     static void frostAlert(@NonNull Dialog dialog) {
         Window window = dialog.getWindow();
@@ -160,7 +160,7 @@ public final class SheetGlass {
         }
         window.setBackgroundDrawable(new android.graphics.drawable.InsetDrawable(
                 new android.graphics.drawable.ColorDrawable(0), inset.left, inset.top, inset.right, inset.bottom));
-        float corner = 28 * panel.getResources().getDisplayMetrics().density;
+        float corner = 18 * panel.getResources().getDisplayMetrics().density;
         panel.setClipToOutline(true);
         panel.setOutlineProvider(new android.view.ViewOutlineProvider() {
             @Override
@@ -196,7 +196,7 @@ public final class SheetGlass {
      * the player like the player's own sheets: a copy of another window never holds the sheet.
      */
     public static void frost(@NonNull View target, @Nullable Activity page) {
-        boolean live = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+        boolean live = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !BatterySaver.lite()
                 && sLivePage != null && sLivePage.isInstance(page);
         frost(target, page != null ? page.getWindow() : null, target,
                 CORNER_DP * target.getResources().getDisplayMetrics().density, live);
@@ -358,7 +358,7 @@ public final class SheetGlass {
                     mBackdrop.setPage(page, origin, pageW, pageH);
                 }
             }
-            if (mLive) {
+            if (mLive && mTarget.getWindowVisibility() == View.VISIBLE) {
                 mMain.postDelayed(this::copy, LIVE_FRAME_MS);
             }
         }
@@ -395,21 +395,39 @@ public final class SheetGlass {
         int step = horizontal ? 1 : w;
         for (int line = 0; line < lines; line++) {
             int start = horizontal ? line * w : line;
+            int sa = 0;
+            int sr = 0;
+            int sg = 0;
+            int sb = 0;
+            int hi = Math.min(len - 1, r);
+            for (int k = 0; k <= hi; k++) {
+                int c = src[start + k * step];
+                sa += c >>> 24;
+                sr += (c >> 16) & 0xFF;
+                sg += (c >> 8) & 0xFF;
+                sb += c & 0xFF;
+            }
             for (int i = 0; i < len; i++) {
-                int sa = 0;
-                int sr = 0;
-                int sg = 0;
-                int sb = 0;
-                int n = 0;
-                for (int k = Math.max(0, i - r); k <= Math.min(len - 1, i + r); k++) {
-                    int c = src[start + k * step];
+                int lo = Math.max(0, i - r);
+                int top = Math.min(len - 1, i + r);
+                int n = top - lo + 1;
+                dst[start + i * step] = (sa / n) << 24 | (sr / n) << 16 | (sg / n) << 8 | (sb / n);
+                int add = i + r + 1;
+                if (add < len) {
+                    int c = src[start + add * step];
                     sa += c >>> 24;
                     sr += (c >> 16) & 0xFF;
                     sg += (c >> 8) & 0xFF;
                     sb += c & 0xFF;
-                    n++;
                 }
-                dst[start + i * step] = (sa / n) << 24 | (sr / n) << 16 | (sg / n) << 8 | (sb / n);
+                int drop = i - r;
+                if (drop >= 0) {
+                    int c = src[start + drop * step];
+                    sa -= c >>> 24;
+                    sr -= (c >> 16) & 0xFF;
+                    sg -= (c >> 8) & 0xFF;
+                    sb -= c & 0xFF;
+                }
             }
         }
     }

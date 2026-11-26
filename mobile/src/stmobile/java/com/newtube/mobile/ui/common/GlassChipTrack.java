@@ -104,6 +104,7 @@ public class GlassChipTrack extends HorizontalScrollView {
 
     public GlassChipTrack(Context context, @Nullable android.util.AttributeSet attrs) {
         super(context, attrs);
+        setLayoutDirection(LAYOUT_DIRECTION_LTR);
         mDp = getResources().getDisplayMetrics().density;
         mLightTheme = ThemeMode.isLight(context);
         mTabs = YouTubeMode.isOn(context);
