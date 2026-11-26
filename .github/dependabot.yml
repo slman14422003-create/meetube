@@ -1,0 +1,17 @@
+# Weekly pull requests for what the build itself uses: the GitHub Actions in the workflows and the
+# Gradle dependencies and wrapper. MediaServiceCore and SharedModules are handled by
+# .github/workflows/update-components.yml.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: [ "*" ]
+  - package-ecosystem: gradle
+    directories: [ "/", "/mobile", "/common" ]
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5

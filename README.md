@@ -39,6 +39,13 @@ Pushing a `vX.Y.Z` tag does the same, once `build.gradle` and the top of `CHANGE
 
 Every update must be signed with the same key, or phones refuse it. Add the secrets `SIGNING_KEY` (the `.jks`, base64), `KEY_STORE_PASSWORD`, `ALIAS` and `KEY_PASSWORD` under **Settings → Secrets and variables → Actions**. Without them the APKs are debug-signed.
 
+## Automatic updates
+
+- **YouTube backend and shared modules:** [update-components.yml](.github/workflows/update-components.yml) checks every Monday for newer `MediaServiceCore` and `SharedModules` commits, builds the app with them and opens a pull request only if the build passes. Merge it, then run **Release**. Enable **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests** once.
+- **Build tools:** Dependabot opens weekly pull requests for the GitHub Actions and Gradle dependencies.
+- **Check on every change:** [ci.yml](.github/workflows/ci.yml) builds the release APK for each pull request.
+- The commits the app is built from are listed in [.github/submodule-pins.env](.github/submodule-pins.env).
+
 ## Build
 
 ```
@@ -46,7 +53,7 @@ Every update must be signed with the same key, or phones refuse it. Add the secr
 # APKs: mobile/build/outputs/renamed_apks/stmobileRelease/MeeTube_<version>_<abi>.apk
 ```
 
-Clone with `--recurse-submodules`, or let the release workflow fetch `MediaServiceCore` and `SharedModules`.
+The workflows clone `MediaServiceCore` and `SharedModules` at the commits in `.github/submodule-pins.env`; do the same locally, or clone with `--recurse-submodules` if your fork has the submodule links.
 
 ## Credits
 
