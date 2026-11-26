@@ -164,7 +164,7 @@ public class BackupAndRestoreHelper implements OnResult {
         unpackTempZip(
                 zipUri,
                 () -> BackupSettingsPresenter.instance(mContext).showLocalRestoreDialogApi30(),
-                error -> MessageHelpers.showLongMessage(mContext, "Failed to restore backup: " + error.getMessage())
+                error -> MessageHelpers.showLongMessage(mContext, mContext.getString(R.string.backup_restore_failed, error.getMessage()))
         );
     }
 
@@ -194,7 +194,7 @@ public class BackupAndRestoreHelper implements OnResult {
 
     private void unpackTempZip(Uri zipUri, Runnable onSuccess, OnError onError) {
         if (zipUri == null) {
-            MessageHelpers.showLongMessage(mContext, "No ZIP received");
+            MessageHelpers.showLongMessage(mContext, mContext.getString(R.string.backup_no_zip_received));
             return;
         }
 

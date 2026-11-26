@@ -1,5 +1,6 @@
 package com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs;
 
+import com.liskovsoft.smartyoutubetv2.common.R;
 import android.content.Context;
 
 import com.liskovsoft.sharedutils.helpers.MessageHelpers;
@@ -63,7 +64,7 @@ public class VideoActionPresenter extends BasePresenter<Void> {
         } else if (item.searchQuery != null ) {
             SearchPresenter.instance(getContext()).onSearch(item.searchQuery);
         } else {
-            MessageHelpers.showMessage(getContext(), "Video item doesn't contain needed data!");
+            MessageHelpers.showMessage(getContext(), getContext().getString(R.string.video_action_missing_data));
         }
     }
 

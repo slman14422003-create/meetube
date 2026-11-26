@@ -1,5 +1,6 @@
 package com.liskovsoft.smartyoutubetv2.common.misc;
 
+import com.liskovsoft.smartyoutubetv2.common.R;
 import android.content.Context;
 import android.util.Pair;
 
@@ -653,7 +654,7 @@ public class MediaServiceManager implements OnAccountChange {
                 Utils.postDelayed(() -> ChannelPresenter.instance(context).updateRows(groups), 100);
             } else {
                 atomicIndex.incrementAndGet();
-                MessageHelpers.showMessage(context, "Unknown type of channel");
+                MessageHelpers.showMessage(context, context.getString(R.string.unknown_channel_type));
             }
         }, error -> {
             LoadingManager.showLoading(context, false);

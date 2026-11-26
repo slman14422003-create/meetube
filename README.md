@@ -118,6 +118,20 @@ Save videos up to **4K** in any folder you pick. **Smart downloads** remember yo
 | 🌏 **Speaks your language** | English, Español, Polski, Português (Brasil), Română, Русский, 简体中文, 繁體中文 and العربية. [Help translate](TRANSLATING.md). |
 | 🔐 **Your account** | Sign in with a code, or use it without an account. Cast to your TV. |
 
+## What's new in this fork
+
+- **Tighter, cleaner corners:** sheets, cards, menus and the greeting panel now use smaller corner radii (12-18dp instead of 22-28dp) for a sharper, more modern look. Pill buttons and search bars keep their capsule shape.
+- **Faster frosted glass:** the sheet blur uses an O(1) sliding-window box blur instead of a per-pixel loop, so sheets open with less main-thread work.
+- **Lighter live blur over video:** the live backdrop behind sheets refreshes at about 20 fps instead of about 30, and stops as soon as the sheet is hidden.
+- **Battery-aware effects:** live blur is skipped entirely when Battery Saver or the in-app battery mode is on.
+- **Reorganized Settings:** five clear groups instead of three:
+  - **App:** General, Customization, Notifications
+  - **Video and audio:** Playback, Video quality, Audio quality, Captions, SponsorBlock, DeArrow
+  - **Content and privacy:** Feeds, History and privacy, Downloads
+  - **Data and performance:** Storage, Battery, Backup and restore
+  - **Other:** Advanced, About
+- **Localized group titles:** the new Settings groups are translated into English and Arabic.
+
 ## Download
 
 Get the APK for your phone from [Releases](https://github.com/yashoncode/meetube/releases/latest):

@@ -212,7 +212,7 @@ public class BackupAndRestoreManager implements MotherActivity.OnPermissions {
 
         if (FileHelpers.isEmpty(sharedPrefsBackupDir)) {
             Log.d(TAG, "Oops. Backup folder is empty.");
-            MessageHelpers.showLongMessage(mContext, "Oops. Backup folder is empty.");
+            MessageHelpers.showLongMessage(mContext, mContext.getString(R.string.backup_folder_empty));
             return;
         }
 
