@@ -34,3 +34,5 @@ Before = checkout of main-perf-step3-4 (or git stash of this step), after = this
   python3 tools/frame-percentiles.py <before dir>/*benchmarkData.json <after dir>/*benchmarkData.json
 Compare with -e compilation none as well (profile effect). JankStats budget: same command with -e class com.newtube.benchmark.HomeJankStatsCheck -e maxJankyPercent 5.
 Regenerate the Home/MeeTune/Greeting profile: -e class com.newtube.benchmark.HomeBaselineProfileGenerator, then copy the *-baseline-prof.txt over the hand-added block in mobile/src/main/baseline-prof.txt.
+
+- CI fix: common/build.gradle had shrinkResources true on a library; Gradle 9.6/AGP 9 fail project evaluation with "Resource shrinker cannot be used for libraries". Removed it (mobile still shrinks resources for the APK). It predates steps 5-6.
