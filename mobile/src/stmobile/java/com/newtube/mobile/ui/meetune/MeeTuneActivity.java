@@ -113,6 +113,7 @@ public class MeeTuneActivity extends MobileActivity implements MiniPlayerBridge.
     protected void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_meetune);
+        com.newtube.mobile.perf.JankProbe.attach(this); // debug and benchmark builds only
         com.newtube.mobile.ui.common.Motion.frostIn(findViewById(android.R.id.content)); // comes in out of MeeTube's blur
         // The mini card reorders its last host through ViewManager; Back from here is MeeTube.
         ViewManager.instance(this).register(MeeTuneActivity.class, MeeTuneActivity.class,
@@ -206,10 +207,13 @@ public class MeeTuneActivity extends MobileActivity implements MiniPlayerBridge.
             MeeTune.leave(this);
         });
         // MEETUNE(greeting): holding the brand opens the music greeting, as on MeeTube.
-        GreetingOverlay greeting = new GreetingOverlay(this, findViewById(R.id.mobile_greet_overlay),
-                source, true, this::showAccountMenu);
+        // NEWTUBE(startup): built after the first frame, or by the first long press (GreetingHolder).
+        com.newtube.mobile.ui.browse.GreetingHolder greeting = new com.newtube.mobile.ui.browse.GreetingHolder(
+                () -> new GreetingOverlay(this, findViewById(R.id.mobile_greet_overlay),
+                        source, true, this::showAccountMenu));
+        com.newtube.mobile.StartupDeferral.afterFirstDraw(this, "greeting-overlay", greeting::get);
         brand.setOnLongClickListener(v -> {
-            greeting.show();
+            greeting.get().show();
             return true;
         });
         mSort.setOnClickListener(v -> {

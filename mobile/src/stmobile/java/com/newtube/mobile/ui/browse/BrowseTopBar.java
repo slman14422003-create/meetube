@@ -37,10 +37,16 @@ final class BrowseTopBar {
             }
         });
         // MEETUBE(greeting): held, on a tab or a sub-screen, it greets with three shortcuts.
-        GreetingOverlay greeting = new GreetingOverlay((androidx.activity.ComponentActivity) activity,
-                activity.findViewById(R.id.mobile_greet_overlay), activity.findViewById(R.id.mobile_blur_target), false, null);
+        // NEWTUBE(startup): the overlay inflates three layouts and wires four glass views, none of
+        // which the first frame needs. Built in an idle gap after it, or by the first long press
+        // if that comes sooner (GreetingHolder keeps it to one build).
+        GreetingHolder greeting = new GreetingHolder(() -> new GreetingOverlay(
+                (androidx.activity.ComponentActivity) activity,
+                activity.findViewById(R.id.mobile_greet_overlay),
+                activity.findViewById(R.id.mobile_blur_target), false, null));
+        com.newtube.mobile.StartupDeferral.afterFirstDraw(activity, "greeting-overlay", greeting::get);
         activity.findViewById(R.id.mobile_brand_glass).setOnLongClickListener(v -> {
-            greeting.show();
+            greeting.get().show();
             return true;
         });
     }

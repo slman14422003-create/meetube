@@ -1,5 +1,6 @@
 package com.newtube.mobile.player;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.content.Context;
 
 import com.liskovsoft.smartyoutubetv2.tv.BuildConfig;
@@ -34,7 +35,7 @@ public final class SabrSourcePreference {
     public static boolean isPreferred(Context context) {
         Boolean override = debugOverride("debug.arc.sabr_vod");
         if (override != null) return override;
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_PREFER, false);
+        return PrefCache.getBoolean(context, PREFS, KEY_PREFER, false);
     }
 
     /**

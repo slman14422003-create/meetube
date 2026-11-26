@@ -96,17 +96,25 @@ public final class HomePreview implements HomePreviewPlayer.Callback {
     @Nullable private CharSequence mBadgeText; // the badge as bound, put back when the preview ends
     private boolean mCaptions;
 
+    private int mTickStep = -1;
+    private long mTickSecs = -1;
     private final Runnable mPick = this::pick;
     private final Runnable mTick = new Runnable() {
         @Override
         public void run() {
             if (mHolder != null) {
                 if (!mDragging) {
-                    showProgress(mPlayer.progress());
+                    int step = Math.round(1000 * mPlayer.progress());
+                    if (step != mTickStep) {
+                        mTickStep = step;
+                        showProgress(mPlayer.progress());
+                    }
                 }
                 long left = mPlayer.remainingMs();
                 TextView badge = mHolder.badge();
-                if (left >= 0 && badge.getVisibility() == View.VISIBLE) { // the duration counts down, as on YouTube
+                long secs = left >= 0 ? (left + 999) / 1000 : -1;
+                if (left >= 0 && badge.getVisibility() == View.VISIBLE && secs != mTickSecs) { // the duration counts down, as on YouTube
+                    mTickSecs = secs;
                     long s = (left + 999) / 1000;
                     badge.setText(s >= 3600 ? String.format(java.util.Locale.US, "%d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)
                             : String.format(java.util.Locale.US, "%d:%02d", s / 60, s % 60));
@@ -128,6 +136,22 @@ public final class HomePreview implements HomePreviewPlayer.Callback {
         mTexture = new TextureView(mContext);
         mTexture.setAlpha(0f);
         mOverlay.addView(mTexture, new FrameLayout.LayoutParams(-1, -1));
+        mOverlay.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                if (mHolder != null && mPlayer != null) {
+                    mTickStep = -1;
+                    mTickSecs = -1;
+                    mMain.removeCallbacks(mTick);
+                    mMain.post(mTick);
+                }
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                mMain.removeCallbacks(mTick);
+            }
+        });
         mCues = new TextView(mContext);
         mCues.setTextColor(Color.WHITE);
         mCues.setTextSize(13);
@@ -347,6 +371,8 @@ public final class HomePreview implements HomePreviewPlayer.Callback {
         mScrub.setVisibility(View.VISIBLE);
         mMute.setVisibility(View.VISIBLE);
         syncButtons();
+        mTickStep = -1;
+        mTickSecs = -1;
         mMain.removeCallbacks(mTick);
         mMain.post(mTick);
     }

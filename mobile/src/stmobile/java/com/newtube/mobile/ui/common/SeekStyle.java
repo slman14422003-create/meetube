@@ -11,7 +11,7 @@ public final class SeekStyle {
     }
 
     public static boolean isPill(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_PILL, true);
+        return PrefCache.getBoolean(context, PREFS, KEY_PILL, true);
     }
 
     public static void setPill(Context context, boolean pill) {

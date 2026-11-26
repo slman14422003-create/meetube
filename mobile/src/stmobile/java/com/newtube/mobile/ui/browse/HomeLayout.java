@@ -1,5 +1,6 @@
 package com.newtube.mobile.ui.browse;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.content.Context;
 
 /** MEETUBE(home-rows): Settings > General > Home layout - one feed (default) or SmartTube's rows. */
@@ -13,7 +14,7 @@ public final class HomeLayout {
     }
 
     public static boolean isRows(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_ROWS, false);
+        return PrefCache.getBoolean(context, PREFS, KEY_ROWS, false);
     }
 
     public static void setRows(Context context, boolean rows) {
@@ -22,7 +23,7 @@ public final class HomeLayout {
 
     /** MEETUBE(list layout, issue #82): Settings > Video layout - videos as cards (default) or as list rows. */
     public static boolean isVideoList(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_VIDEO_LIST, false);
+        return PrefCache.getBoolean(context, PREFS, KEY_VIDEO_LIST, false);
     }
 
     public static void setVideoList(Context context, boolean list) {
@@ -52,7 +53,7 @@ public final class HomeLayout {
 
     /** {@link #FOLLOW}, {@link #CARDS} or {@link #LIST}. */
     public static int videoLayout(Context context, String page) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_VIDEO_LIST + "_" + page, FOLLOW);
+        return PrefCache.getInt(context, PREFS, KEY_VIDEO_LIST + "_" + page, FOLLOW);
     }
 
     public static void setVideoLayout(Context context, String page, int layout) {
@@ -61,7 +62,7 @@ public final class HomeLayout {
 
     /** MEETUBE(issue #43): Settings > Shorts on Home - Home's Shorts rows as a sideways shelf (default) or left out. */
     public static boolean isShortsShelf(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_SHORTS_SHELF, true);
+        return PrefCache.getBoolean(context, PREFS, KEY_SHORTS_SHELF, true);
     }
 
     public static void setShortsShelf(Context context, boolean shelf) {

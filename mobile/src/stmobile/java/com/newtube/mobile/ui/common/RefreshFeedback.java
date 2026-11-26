@@ -24,7 +24,7 @@ public final class RefreshFeedback {
     }
 
     public static boolean isSoundOn(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_SOUND, false);
+        return PrefCache.getBoolean(context, PREFS, KEY_SOUND, false);
     }
 
     public static void setSoundOn(Context context, boolean on) {

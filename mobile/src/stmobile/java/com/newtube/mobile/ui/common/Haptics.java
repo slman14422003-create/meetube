@@ -87,7 +87,7 @@ public final class Haptics {
 
     /** MEETUBE(haptics): Settings > App > Haptics. Every vibration of the app asks this first. */
     public static boolean isOn(@NonNull Context context) {
-        return context.getSharedPreferences("meetube_app", Context.MODE_PRIVATE).getBoolean("haptics", true);
+        return PrefCache.getBoolean(context, "meetube_app", "haptics", true);
     }
 
     public static void setOn(@NonNull Context context, boolean on) {

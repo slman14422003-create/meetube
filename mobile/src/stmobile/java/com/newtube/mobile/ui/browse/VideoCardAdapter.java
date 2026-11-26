@@ -99,9 +99,19 @@ public class VideoCardAdapter extends ListAdapter<Video, RecyclerView.ViewHolder
     public VideoCardAdapter setListRows(boolean listRows) {
         if (mListRows != listRows) {
             mListRows = listRows;
-            notifyDataSetChanged();
+            int count = getItemCount();
+            if (count > 0) {
+                notifyItemRangeChanged(0, count);
+            }
         }
         return this;
+    }
+
+    /** Sizes a pool shared by several strips so each view type keeps {@code perType} spare holders. */
+    static void sizePool(RecyclerView.RecycledViewPool pool, int perType) {
+        for (int type = VIEW_TYPE_VIDEO; type <= VIEW_TYPE_SHORTS_SHELF; type++) {
+            pool.setMaxRecycledViews(type, perType);
+        }
     }
 
     public VideoCardAdapter(OnVideoClickListener clickListener) {

@@ -69,8 +69,7 @@ public class Media3TrackAdapter {
     private static final String KEY_FORCE_QUALITY = "force_quality";
 
     static void loadForceQuality(android.content.Context context) {
-        sForceQuality = context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
-                .getBoolean(KEY_FORCE_QUALITY, true);
+        sForceQuality = com.newtube.mobile.ui.common.PrefCache.getBoolean(context, PREFS, KEY_FORCE_QUALITY, true);
     }
 
     public static boolean isForceQuality(android.content.Context context) {

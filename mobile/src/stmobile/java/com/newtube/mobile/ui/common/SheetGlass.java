@@ -46,10 +46,23 @@ import java.lang.ref.WeakReference;
 public final class SheetGlass {
     /** The copy is this many times smaller than the page; scaling it back up adds to the blur. */
     private static final int SCALE = 8;
+    /** A live sheet's copies are smaller still: the GPU blurs them, and they are taken ten times a second. */
+    private static final int LIVE_SCALE = 12;
+    /** A sheet that moved this recently is being dragged or is animating: no copy is taken meanwhile. */
+    private static final long MOVING_MS = 150L;
     private static final int BLUR_RADIUS = 3;
     private static final float CORNER_DP = 18f;
-    /** A live sheet's copies: about the frame rate of most videos. */
-    private static final long LIVE_FRAME_MS = 50;
+    /** A live sheet's copies: 10 a second at most (the frost is blurred 28px deep, so little shows between them). */
+    private static long liveFrameMs() {
+        return 100L;
+    }
+
+    /** Live copies run at Full only; Light takes one copy as the sheet opens, Flat none. */
+    private static boolean liveAllowed(@Nullable Activity page) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && Glass.liveBlur()
+                && Glass.quality() == Glass.QUALITY_FULL && sLivePage != null && sLivePage.isInstance(page);
+    }
+
     /**
      * A live copy's GPU blur, in page pixels: as soft as {@link #blur} makes a 1/8 copy (three box
      * passes of radius 3 are a sigma of 3.5 there, 28 on the page; RenderEffect's radius r is a sigma
@@ -134,8 +147,7 @@ public final class SheetGlass {
             sheet.setClipChildren(false);
             // Live only for a sheet in its own window: a copy of a page holding the sheet would
             // blur the sheet into itself.
-            boolean live = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !BatterySaver.lite()
-                    && sLivePage != null && sLivePage.isInstance(activity);
+            boolean live = liveAllowed(activity);
             frost(sheet.getChildAt(0), activity.getWindow(), sheet,
                     rounded ? CORNER_DP * sheet.getResources().getDisplayMetrics().density : 0f, live);
         }
@@ -196,8 +208,7 @@ public final class SheetGlass {
      * the player like the player's own sheets: a copy of another window never holds the sheet.
      */
     public static void frost(@NonNull View target, @Nullable Activity page) {
-        boolean live = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !BatterySaver.lite()
-                && sLivePage != null && sLivePage.isInstance(page);
+        boolean live = liveAllowed(page);
         frost(target, page != null ? page.getWindow() : null, target,
                 CORNER_DP * target.getResources().getDisplayMetrics().density, live);
     }
@@ -227,8 +238,8 @@ public final class SheetGlass {
             rim(cover, cornerPx, tint == 0);
         }
         View decor = page != null ? page.peekDecorView() : null;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || decor == null) {
-            return;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || decor == null || Glass.quality() == Glass.QUALITY_FLAT) {
+            return; // Flat: the sheet keeps its plain surface, nothing is copied
         }
         new Feed(target, page, decor, cover, cornerPx, live, tint).copy();
     }
@@ -268,9 +279,12 @@ public final class SheetGlass {
     }
 
     /**
-     * Copies the page into a sheet's backdrop: once, blurred here, or for a live sheet again each
-     * frame until the sheet goes, left for the GPU to blur. Three bitmaps take turns, so the one
-     * written is never the one drawn or one a frame in flight reads.
+     * Copies the page into a sheet's backdrop: once, or for a live sheet again ten times a second at
+     * most, only while the sheet's window and the page's are visible and the sheet is not being
+     * dragged or animated. From API 31 the GPU blurs the copy as the sheet draws; before that the
+     * copy is blurred here, once. The copies are small, and the bitmaps are reused: three take turns
+     * for a live sheet (the one written is never the one drawn or one a frame in flight reads), one
+     * for a still sheet.
      */
     private static final class Feed {
         private final View mTarget;
@@ -279,10 +293,13 @@ public final class SheetGlass {
         private final View mCover;
         private final float mCorner;
         private final boolean mLive;
+        private final boolean mGpu;
         private final int mTint;
         private final Handler mMain = new Handler(Looper.getMainLooper());
-        private final Bitmap[] mRing = new Bitmap[3];
+        private final Runnable mTick = this::copy;
+        private final Bitmap[] mRing;
         private int mNext;
+        private boolean mInFlight;
         @Nullable
         private Backdrop mBackdrop;
 
@@ -294,16 +311,62 @@ public final class SheetGlass {
             mCover = cover;
             mCorner = corner;
             mLive = live;
+            mGpu = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S;
+            mRing = new Bitmap[live ? 3 : 1];
+            if (live) {
+                // A window that comes back to the front starts the copies again.
+                target.getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+                    @Override
+                    public void onWindowFocusChanged(boolean hasFocus) {
+                        if (!mTarget.isAttachedToWindow()) {
+                            ViewTreeObserver observer = mTarget.getViewTreeObserver();
+                            if (observer.isAlive()) {
+                                observer.removeOnWindowFocusChangeListener(this);
+                            }
+                            return;
+                        }
+                        if (hasFocus && mBackdrop != null) {
+                            schedule(0L);
+                        }
+                    }
+                });
+            }
+        }
+
+        /** True while copies should run: both windows on screen. */
+        private boolean visible() {
+            return Glass.liveBlur() && Glass.quality() == Glass.QUALITY_FULL && mTarget.isAttachedToWindow()
+                    && mTarget.getWindowVisibility() == View.VISIBLE && mDecor.getWindowVisibility() == View.VISIBLE;
+        }
+
+        private void schedule(long delayMs) {
+            mMain.removeCallbacks(mTick);
+            if (!mInFlight) {
+                mMain.postDelayed(mTick, delayMs);
+            }
         }
 
         void copy() {
+            if (mBackdrop != null) {
+                if (!mLive || !visible()) {
+                    return; // stopped; a window that returns restarts it (the focus listener)
+                }
+                if (mBackdrop.moving()) {
+                    schedule(liveFrameMs()); // dragged or animating: keep the last copy, ask again
+                    return;
+                }
+            }
+            if (mInFlight) {
+                return;
+            }
             int pageW = mDecor.getWidth();
             int pageH = mDecor.getHeight();
             if (pageW == 0 || pageH == 0) {
                 return;
             }
-            int w = Math.max(1, pageW / SCALE);
-            int h = Math.max(1, pageH / SCALE);
+            int scale = mLive ? LIVE_SCALE : SCALE;
+            int w = Math.max(1, pageW / scale);
+            int h = Math.max(1, pageH / scale);
             Bitmap copy = mRing[mNext];
             if (copy == null || copy.getWidth() != w || copy.getHeight() != h) {
                 copy = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
@@ -314,16 +377,18 @@ public final class SheetGlass {
             mDecor.getLocationOnScreen(origin);
             Bitmap page = copy;
             try {
+                mInFlight = true;
                 PixelCopy.request(mPage, page, result -> {
+                    mInFlight = false;
                     boolean copied = result == PixelCopy.SUCCESS;
-                    if (copied && !mLive) {
+                    if (copied && !mLive && !mGpu) {
                         // The message pill is frosted, not see-through: twice the blur, shapes gone.
                         blur(page, mTint != 0 ? BLUR_RADIUS * 2 : BLUR_RADIUS);
                     }
                     show(copied ? page : null, origin, pageW, pageH);
                 }, mMain);
             } catch (IllegalArgumentException e) {
-                // The page's window has no surface (already gone): keep what the sheet shows.
+                mInFlight = false; // The page's window has no surface (already gone): keep what the sheet shows.
             }
         }
 
@@ -351,15 +416,16 @@ public final class SheetGlass {
             }
             if (page != null) {
                 if (mBackdrop == null) {
-                    mBackdrop = new Backdrop(mTarget, mCover, mCorner, mLive, mTint);
+                    mBackdrop = new Backdrop(mTarget, mCover, mCorner, mLive || mGpu,
+                            mTint != 0 ? LIVE_BLUR_PX * 2 : LIVE_BLUR_PX, mTint);
                     mBackdrop.setPage(page, origin, pageW, pageH);
                     mTarget.setBackground(mBackdrop);
                 } else {
                     mBackdrop.setPage(page, origin, pageW, pageH);
                 }
             }
-            if (mLive && mTarget.getWindowVisibility() == View.VISIBLE) {
-                mMain.postDelayed(this::copy, LIVE_FRAME_MS);
+            if (mLive && visible()) {
+                schedule(liveFrameMs());
             }
         }
     }
@@ -448,18 +514,20 @@ public final class SheetGlass {
         private final int[] mLoc = new int[2];
         private int mDrawnX = Integer.MIN_VALUE;
         private int mDrawnY = Integer.MIN_VALUE;
-        /** A live sheet's page comes unblurred: drawn into this node, which blurs it on the GPU. */
+        private boolean mLocKnown;
+        private long mMovedAt = Long.MIN_VALUE;
+        /** A GPU-blurred page (live, or any from API 31) comes unblurred: drawn into this node, which blurs it. */
         @Nullable
         private final android.graphics.RenderNode mBlurNode;
         private final android.graphics.Path mClip = new android.graphics.Path();
 
-        Backdrop(View target, View cover, float corner, boolean live, int tint) {
+        Backdrop(View target, View cover, float corner, boolean gpuBlur, float blurPx, int tint) {
             mTarget = target;
             mCover = cover;
-            if (live && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (gpuBlur && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 mBlurNode = new android.graphics.RenderNode("MeeTube sheet glass");
                 mBlurNode.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(
-                        LIVE_BLUR_PX / SCALE, LIVE_BLUR_PX / SCALE, Shader.TileMode.CLAMP));
+                        blurPx / SCALE, blurPx / SCALE, Shader.TileMode.CLAMP));
             } else {
                 mBlurNode = null;
             }
@@ -477,7 +545,11 @@ public final class SheetGlass {
                         return true;
                     }
                     target.getLocationOnScreen(mLoc);
+                    mLocKnown = true;
                     if (mLoc[0] != mDrawnX || mLoc[1] != mDrawnY) {
+                        if (mDrawnX != Integer.MIN_VALUE) {
+                            mMovedAt = android.os.SystemClock.uptimeMillis();
+                        }
                         invalidateSelf();
                     }
                     return true;
@@ -485,7 +557,12 @@ public final class SheetGlass {
             });
         }
 
-        /** The page to show (blurred already, unless live), and where on screen it was copied from. */
+        /** True while the sheet is being dragged or animated: a copy now would be thrown away. */
+        boolean moving() {
+            return android.os.SystemClock.uptimeMillis() - mMovedAt < MOVING_MS;
+        }
+
+        /** The page to show (blurred already, unless GPU-blurred), and where on screen it was copied from. */
         void setPage(Bitmap page, int[] origin, int pageW, int pageH) {
             mOrigin = origin;
             mScaleX = pageW / (float) page.getWidth();
@@ -497,7 +574,9 @@ public final class SheetGlass {
 
         @Override
         public void draw(@NonNull Canvas canvas) {
-            mTarget.getLocationOnScreen(mLoc);
+            if (!mLocKnown) {
+                mTarget.getLocationOnScreen(mLoc); // once; the pre-draw pass keeps it current after that
+            }
             mDrawnX = mLoc[0];
             mDrawnY = mLoc[1];
             mMatrix.setScale(mScaleX, mScaleY);

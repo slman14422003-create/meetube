@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -85,16 +86,23 @@ final class FeedStrip extends RecyclerView.Adapter<FeedStrip.Holder> {
         boolean wasShown = getItemCount() > 0;
         boolean sameList = mode == mMode && sameItems(items);
         int oldMode = mMode;
+        long oldSelected = mSelected;
         mMode = items == null || items.isEmpty() ? MODE_NONE : mode;
         if (oldMode != mMode) {
+            int removed = mItems.mList.size();
             mItems.mList = new ArrayList<>(); // another kind of cell: rebuild, not rebind
-            mItems.notifyDataSetChanged();
+            if (removed > 0) {
+                mItems.notifyItemRangeRemoved(0, removed);
+            }
         }
         mSelected = selected;
         if (!sameList) {
-            mItems.mList = items != null ? new ArrayList<>(items) : new ArrayList<>();
+            List<Item> old = mItems.mList;
+            List<Item> next = items != null ? new ArrayList<>(items) : new ArrayList<>();
+            mItems.mList = next;
+            DiffUtil.calculateDiff(new ItemDiff(old, next), false).dispatchUpdatesTo(mItems);
         }
-        mItems.notifyDataSetChanged();
+        notifySelection(oldSelected, selected);
         boolean shown = getItemCount() > 0;
         if (wasShown && !shown) {
             notifyItemRemoved(0);
@@ -102,6 +110,64 @@ final class FeedStrip extends RecyclerView.Adapter<FeedStrip.Holder> {
             notifyItemInserted(0);
         }
         syncTrack();
+    }
+
+    private static final Object PAYLOAD_SELECTION = new Object();
+
+    /** Rebinds only the cells whose picked look changes: the old and new pick, or all when "All" moves the dimming. */
+    private void notifySelection(long oldSelected, long selected) {
+        if (oldSelected == selected) {
+            return;
+        }
+        List<Item> list = mItems.mList;
+        int count = list.size();
+        if (count == 0) {
+            return;
+        }
+        if (mMode == MODE_AVATARS && (oldSelected == list.get(0).id || selected == list.get(0).id)) {
+            mItems.notifyItemRangeChanged(0, count, PAYLOAD_SELECTION); // the dimming follows whether "All" is picked
+            return;
+        }
+        for (int i = 0; i < count; i++) {
+            long id = list.get(i).id;
+            if (id == oldSelected || id == selected) {
+                mItems.notifyItemChanged(i, PAYLOAD_SELECTION);
+            }
+        }
+    }
+
+    private static final class ItemDiff extends DiffUtil.Callback {
+        private final List<Item> mOld;
+        private final List<Item> mNew;
+
+        ItemDiff(List<Item> oldItems, List<Item> newItems) {
+            mOld = oldItems;
+            mNew = newItems;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return mOld.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return mNew.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldPosition, int newPosition) {
+            return mOld.get(oldPosition).id == mNew.get(newPosition).id;
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldPosition, int newPosition) {
+            Item a = mOld.get(oldPosition);
+            Item b = mNew.get(newPosition);
+            return android.text.TextUtils.equals(a.label, b.label)
+                    && (a.imageUrl == null ? b.imageUrl == null : a.imageUrl.equals(b.imageUrl))
+                    && a.data == b.data;
+        }
     }
 
     /** The segment style of the chips (Settings > Customization > Chips style): fed the same items. */
@@ -142,8 +208,9 @@ final class FeedStrip extends RecyclerView.Adapter<FeedStrip.Holder> {
     }
 
     void select(long selected) {
+        long oldSelected = mSelected;
         mSelected = selected;
-        mItems.notifyDataSetChanged();
+        notifySelection(oldSelected, selected);
         syncTrack();
     }
 

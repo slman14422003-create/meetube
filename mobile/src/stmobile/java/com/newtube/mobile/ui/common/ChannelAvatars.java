@@ -286,6 +286,9 @@ public final class ChannelAvatars {
             float cx = b.exactCenterX();
             float cy = b.exactCenterY();
             float r = Math.min(b.width(), b.height()) / 2f;
+            if (r <= 0f) {
+                return; // empty bounds (a layout-direction change before the first layout): RadialGradient needs a radius > 0
+            }
             // Two soft colour blobs, like a blurred photo behind frosted glass.
             int core = android.graphics.Color.HSVToColor(230, new float[] {mHue, 0.6f, 1f});
             int edge = android.graphics.Color.HSVToColor(120, new float[] {(mHue + 50) % 360, 0.55f, 0.6f});
@@ -304,6 +307,9 @@ public final class ChannelAvatars {
         public void draw(@NonNull Canvas canvas) {
             Rect b = getBounds();
             float r = Math.min(b.width(), b.height()) / 2f;
+            if (r <= 0f) {
+                return;
+            }
             long age = android.os.SystemClock.uptimeMillis() - mStart;
             float breath = age < PULSE_MS
                     ? 0.75f + 0.25f * (float) (0.5 - 0.5 * Math.cos(2 * Math.PI * age / PERIOD_MS)) : 1f;

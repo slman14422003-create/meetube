@@ -25,8 +25,7 @@ public final class YouTubeMode {
     }
 
     public static boolean isOn(Context context) {
-        return context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .getBoolean("on", false);
+        return PrefCache.getBoolean(context, PREFS, "on", false);
     }
 
     public static void setOn(Context context, boolean on) {

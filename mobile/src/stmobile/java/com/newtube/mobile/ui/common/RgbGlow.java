@@ -111,20 +111,7 @@ public final class RgbGlow extends View {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (!ValueAnimator.areAnimatorsEnabled()) {
-            return;
-        }
-        mCycle = ValueAnimator.ofFloat(0f, 360f);
-        mCycle.setDuration(CYCLE_MS);
-        mCycle.setRepeatCount(ValueAnimator.INFINITE);
-        mCycle.setInterpolator(new LinearInterpolator());
-        mCycle.addUpdateListener(a -> {
-            mHue = (220f + (float) a.getAnimatedValue()) % 360f;
-            invalidate();
-            mBand.invalidateSelf(); // every frame: also follows the page as it scrolls
-        });
-        mCycle.start();
-        syncCycle(); // attached under the hidden You panel: no frames until it shows
+        syncCycle();
     }
 
     /**
@@ -133,14 +120,19 @@ public final class RgbGlow extends View {
      * video, which then stuttered (issue #229).
      */
     private void syncCycle() {
-        if (mCycle == null) {
-            return;
+        boolean run = mShown && isAttachedToWindow() && hasWindowFocus() && isRgb(getContext()) && AnimGate.allowed();
+        if (run && mCycle == null) {
+            mCycle = ValueAnimator.ofFloat(0f, 360f);
+            mCycle.setDuration(CYCLE_MS);
+            mCycle.setRepeatCount(ValueAnimator.INFINITE);
+            mCycle.setInterpolator(new LinearInterpolator());
+            mCycle.addUpdateListener(a -> {
+                mHue = (220f + (float) a.getAnimatedValue()) % 360f;
+                invalidate();
+                mBand.invalidateSelf();
+            });
         }
-        if (mShown && hasWindowFocus() && isRgb(getContext())) {
-            mCycle.resume();
-        } else {
-            mCycle.pause();
-        }
+        AnimGate.sync(mCycle, run);
     }
 
     @Override
@@ -208,6 +200,9 @@ public final class RgbGlow extends View {
     }
 
     private void light(Canvas canvas, float cx, float cy, float radius, int color) {
+        if (radius <= 0f) {
+            return;
+        }
         int rgb = color & 0xFFFFFF;
         for (int i = 0; i < STOPS.length; i++) {
             mColors[i] = Math.round(255 * PEAK * FALLOFF[i]) << 24 | rgb;

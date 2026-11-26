@@ -11,7 +11,7 @@ public final class BadgeIcons {
     }
 
     public static boolean isShown(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_SHOWN, true);
+        return PrefCache.getBoolean(context, PREFS, KEY_SHOWN, true);
     }
 
     public static void setShown(Context context, boolean shown) {

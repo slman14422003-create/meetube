@@ -16,7 +16,7 @@ public final class HomeBar {
     }
 
     public static boolean castShown(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CAST, true);
+        return PrefCache.getBoolean(context, PREFS, KEY_CAST, true);
     }
 
     public static void setCastShown(Context context, boolean shown) {
@@ -25,7 +25,7 @@ public final class HomeBar {
 
     /** Issue #326: a bell in the top bar that opens Notifications. Off by default. */
     public static boolean bellShown(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_BELL, false);
+        return PrefCache.getBoolean(context, PREFS, KEY_BELL, false);
     }
 
     public static void setBellShown(Context context, boolean shown) {
@@ -33,7 +33,7 @@ public final class HomeBar {
     }
 
     public static boolean chipsShown(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CHIPS, true);
+        return PrefCache.getBoolean(context, PREFS, KEY_CHIPS, true);
     }
 
     public static void setChipsShown(Context context, boolean shown) {

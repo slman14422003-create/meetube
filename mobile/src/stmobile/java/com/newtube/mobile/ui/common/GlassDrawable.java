@@ -58,6 +58,9 @@ public final class GlassDrawable extends Drawable {
     private final RectF mShape = new RectF();
     private final int[] mLoc = new int[2];
     private final int[] mSourceLoc = new int[2];
+    private int mSeenVersion = -1;
+    private float mStampX = Float.NaN;
+    private float mStampY = Float.NaN;
     private int mRecordedX = Integer.MIN_VALUE;
     private int mRecordedY = Integer.MIN_VALUE;
     @Nullable
@@ -202,7 +205,7 @@ public final class GlassDrawable extends Drawable {
             // re-sample when the button moves over the video (a rotation re-centres the transport)
             // ...and when the source starts or stops sampling (HDR output)
             host.getViewTreeObserver().addOnPreDrawListener(() -> {
-                if (host.isShown() && (mSampled != mSource.sampling || moved())) {
+                if (host.isShown() && Glass.liveBlur() && (mSampled != mSource.sampling || (changed() && moved()))) {
                     invalidateSelf();
                 }
                 return true;
@@ -233,13 +236,15 @@ public final class GlassDrawable extends Drawable {
             return;
         }
         float r = Math.min(mShape.width(), mShape.height()) / 2f;
-        mSampled = mSource != null && mSource.sampling && !BatterySaver.lite(); // MEETUBE(issue #93)
+        mSampled = mSource != null && mSource.sampling && Glass.liveBlur(); // MEETUBE(issue #93)
         boolean live = mNode != null && !mPaused && mSampled && canvas.isHardwareAccelerated()
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S;
         mTint.setColor(live || mSource == null || mPaused || !mSampled
                 ? (mTintColor != 0 ? mTintColor : mPage ? PAGE_TINT : TINT) : FALLBACK_TINT);
         if (live) {
-            moved();
+            if (mRecordedX == Integer.MIN_VALUE || changed()) {
+                moved();
+            }
             mRecordedX = mLoc[0] - mSourceLoc[0];
             mRecordedY = mLoc[1] - mSourceLoc[1];
             int w = Math.round(mShape.width());
@@ -272,10 +277,34 @@ public final class GlassDrawable extends Drawable {
         }
     }
 
+    /** Plain field reads: true when the source's version moved or the host sits elsewhere than at the last test. */
+    private boolean changed() {
+        int version = mSource.version();
+        float x = 0f;
+        float y = 0f;
+        View v = mHost;
+        while (true) {
+            x += v.getLeft() + v.getTranslationX() - v.getScrollX();
+            y += v.getTop() + v.getTranslationY() - v.getScrollY();
+            android.view.ViewParent parent = v.getParent();
+            if (!(parent instanceof View)) {
+                break;
+            }
+            v = (View) parent;
+        }
+        if (version == mSeenVersion && x == mStampX && y == mStampY) {
+            return false;
+        }
+        mSeenVersion = version;
+        mStampX = x;
+        mStampY = y;
+        return true;
+    }
+
     /** Refreshes where the glass sits on the source; true when that differs from the last recording. */
     private boolean moved() {
         mHost.getLocationInWindow(mLoc);
-        mSource.getLocationInWindow(mSourceLoc);
+        mSource.windowLocation(mSourceLoc);
         mLoc[0] += Math.round(mShape.left);
         mLoc[1] += Math.round(mShape.top);
         return mLoc[0] - mSourceLoc[0] != mRecordedX || mLoc[1] - mSourceLoc[1] != mRecordedY;

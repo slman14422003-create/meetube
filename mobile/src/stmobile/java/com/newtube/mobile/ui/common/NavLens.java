@@ -60,6 +60,7 @@ public final class NavLens extends View {
     @Nullable private ValueAnimator mAnimator;
     private int mEffectW;
     private int mEffectH;
+    private int mEffectQuality = -1;
     /** How much bigger the bar looks through it right now: MAGNIFY in flight, 1 at rest (no ghost as it fades). */
     private float mMagnify = 1f;
     /** The lens centre, in the bar's coordinates. */
@@ -72,7 +73,7 @@ public final class NavLens extends View {
     }
 
     public static boolean supported(Context context) {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && Glass.isLiquid(context);
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && Glass.isLiquid(context) && Glass.liveBlur();
     }
 
     /**
@@ -80,8 +81,8 @@ public final class NavLens extends View {
      * person turned it off, or, untouched, on a low-end phone ({@link #lowEnd}).
      */
     public static boolean enabled(Context context) {
-        android.content.SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        return prefs.contains(KEY_MOTION) ? prefs.getBoolean(KEY_MOTION, true) : !lowEnd(context);
+        return PrefCache.has(context, PREFS, KEY_MOTION)
+                ? PrefCache.getBoolean(context, PREFS, KEY_MOTION, true) : !lowEnd(context);
     }
 
     public static void setEnabled(Context context, boolean on) {
@@ -317,10 +318,12 @@ public final class NavLens extends View {
             mNode = new RenderNode("MeeTube nav lens");
         }
         mNode.setPosition(0, 0, w, h);
-        if (w != mEffectW || h != mEffectH) {
+        if (w != mEffectW || h != mEffectH || mEffectQuality != Glass.quality()) {
             mEffectW = w;
             mEffectH = h;
-            RuntimeShader lens = new RuntimeShader(GlassView.REFRACTION_AGSL);
+            mEffectQuality = Glass.quality();
+            RuntimeShader lens = new RuntimeShader(Glass.quality() == Glass.QUALITY_FULL
+                    ? GlassView.REFRACTION_AGSL : GlassView.REFRACTION_LITE_AGSL);
             lens.setFloatUniform("size", w, h);
             lens.setFloatUniform("radius", Math.min(w, h) / 2f);
             lens.setFloatUniform("refractionHeight", REFRACTION_DP * mDensity);

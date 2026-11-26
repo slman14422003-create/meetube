@@ -25,7 +25,7 @@ public final class CountStyle {
     }
 
     public static boolean isIndian(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_INDIAN, false);
+        return PrefCache.getBoolean(context, PREFS, KEY_INDIAN, false);
     }
 
     public static void setIndian(Context context, boolean indian) {

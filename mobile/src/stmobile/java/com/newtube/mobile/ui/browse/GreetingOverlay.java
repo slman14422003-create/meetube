@@ -67,6 +67,7 @@ public final class GreetingOverlay {
         mLine = overlay.findViewById(R.id.mobile_greet_line);
         Glass.blur(mOverlay, mBlurTarget);
         mOverlay.setOnClickListener(v -> hide());
+        mContent.setOnClickListener(v -> hide()); // the scroll view above eats taps on empty space
 
         mStats = LayoutInflater.from(activity).inflate(R.layout.item_mobile_greet_stats, mContent, false);
         mContent.addView(mStats);
@@ -79,9 +80,6 @@ public final class GreetingOverlay {
         mTimer.findViewById(R.id.focus_label).setOnClickListener(this::pickMinutes);
         mTimer.findViewById(R.id.focus_toggle).setOnClickListener(this::toggleTimer);
         if (meeTune) {
-            // MEETUNE(greeting): give the longer Sleep timer label room beside the button.
-            mTimer.setMinimumWidth(mTimer.getLayoutParams().width);
-            mTimer.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
             addOption(mContent, R.drawable.ic_mobile_settings, R.string.meetune_settings, meeTuneSettings);
             return;
         }
@@ -120,7 +118,7 @@ public final class GreetingOverlay {
 
     /** MEETUBE(stats): its own heavier frost of the page, so a card or button reads as frosted glass on the greeting's. */
     private void frost(View glass) {
-        ((com.newtube.mobile.ui.common.GlassView) glass).setBlur(28f);
+        ((com.newtube.mobile.ui.common.GlassView) glass).setBlur(20f);
         Glass.blur(glass, mBlurTarget);
     }
 
@@ -140,15 +138,11 @@ public final class GreetingOverlay {
         mActivity.getOnBackPressedDispatcher().addCallback(mBack);
 
         mOverlay.animate().cancel();
-        mContent.animate().cancel();
         mOverlay.setVisibility(View.VISIBLE);
         mOverlay.setAlpha(0f);
+        // Alpha only, in one cached layer: scaling moved every glass card, and each one re-blurred the page per frame.
         mOverlay.animate().alpha(1f).setDuration(Motion.ENTER_MS)
-                .setInterpolator(Motion.EMPHASIZED_DECELERATE).start();
-        mContent.setScaleX(0.92f);
-        mContent.setScaleY(0.92f);
-        mContent.animate().scaleX(1f).scaleY(1f).setDuration(Motion.ENTER_MS)
-                .setInterpolator(Motion.EMPHASIZED_DECELERATE).start();
+                .setInterpolator(Motion.EMPHASIZED_DECELERATE).withLayer().start();
     }
 
     private void hide() {
@@ -159,7 +153,7 @@ public final class GreetingOverlay {
         }
         mOverlay.animate().cancel();
         mOverlay.animate().alpha(0f).setDuration(Motion.EXIT_MS)
-                .setInterpolator(Motion.EMPHASIZED_ACCELERATE)
+                .setInterpolator(Motion.EMPHASIZED_ACCELERATE).withLayer()
                 .withEndAction(() -> mOverlay.setVisibility(View.GONE)).start();
     }
 
@@ -291,6 +285,7 @@ public final class GreetingOverlay {
     private void bindStats() {
         android.content.Context context = mActivity;
         float dp = context.getResources().getDisplayMetrics().density;
+        float barsMax = context.getResources().getDimension(R.dimen.greet_bars_height);
         long week = 0;
         long max = 1;
         long[] days = new long[7];
@@ -326,7 +321,7 @@ public final class GreetingOverlay {
             shape.setColor(accent);
             bar.setBackground(shape);
             column.addView(bar, new android.widget.FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    Math.max(Math.round(4 * dp), Math.round(72 * dp * days[i] / max)), android.view.Gravity.BOTTOM));
+                    Math.max(Math.round(4 * dp), Math.round(barsMax * days[i] / max)), android.view.Gravity.BOTTOM));
             android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(0,
                     ViewGroup.LayoutParams.MATCH_PARENT, 1f);
             lp.setMarginStart(Math.round(4 * dp));

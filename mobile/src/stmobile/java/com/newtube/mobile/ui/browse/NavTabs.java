@@ -1,5 +1,6 @@
 package com.newtube.mobile.ui.browse;
 
+import com.newtube.mobile.ui.common.PrefCache;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
@@ -49,7 +50,7 @@ public final class NavTabs {
 
     /** The section id in {@code slot}, or {@link #NONE}. */
     public static int get(Context context, int slot) {
-        return prefs(context).getInt(KEYS[slot], DEFAULTS[slot]);
+        return PrefCache.getInt(context, PREFS, KEYS[slot], DEFAULTS[slot]);
     }
 
     public static void set(Context context, int slot, int sectionId) {
@@ -63,7 +64,7 @@ public final class NavTabs {
 
     /** MEETUBE(you order): discard stale keys and append new defaults after the saved order. */
     public static List<String> libraryOrder(Context context) {
-        return normalizeLibraryOrder(Arrays.asList(prefs(context).getString(KEY_LIBRARY_ORDER, "").split(",")));
+        return normalizeLibraryOrder(Arrays.asList(PrefCache.getString(context, PREFS, KEY_LIBRARY_ORDER, "").split(",")));
     }
 
     public static void setLibraryOrder(Context context, List<String> order) {
@@ -87,7 +88,7 @@ public final class NavTabs {
 
     /** MEETUBE(you page): the You page's Liked videos ("LL") and Watch later ("WL") rows, on by default. */
     public static boolean showLibraryPlaylist(Context context, String playlistId) {
-        return prefs(context).getBoolean("you_" + playlistId, true);
+        return PrefCache.getBoolean(context, PREFS, "you_" + playlistId, true);
     }
 
     public static void setShowLibraryPlaylist(Context context, String playlistId, boolean show) {
@@ -99,7 +100,7 @@ public final class NavTabs {
      * and the app opens on its first tab that is a feed (else You), for a feed-free app.
      */
     public static boolean showHome(Context context) {
-        return prefs(context).getBoolean(KEY_HOME, true);
+        return PrefCache.getBoolean(context, PREFS, KEY_HOME, true);
     }
 
     public static void setShowHome(Context context, boolean show) {
@@ -125,7 +126,7 @@ public final class NavTabs {
 
     /** MEETUBE(nav labels): Settings > Customization > Tab names - the names under the bar's icons. */
     public static boolean showLabels(Context context) {
-        return prefs(context).getBoolean(KEY_LABELS, true);
+        return PrefCache.getBoolean(context, PREFS, KEY_LABELS, true);
     }
 
     public static void setShowLabels(Context context, boolean show) {
@@ -134,7 +135,7 @@ public final class NavTabs {
 
     /** MEETUBE(brand name): Settings > Customization > App name in the top bar - off, the brand pill is only the icon. */
     public static boolean showBrandName(Context context) {
-        return prefs(context).getBoolean(KEY_BRAND_NAME, true);
+        return PrefCache.getBoolean(context, PREFS, KEY_BRAND_NAME, true);
     }
 
     public static void setShowBrandName(Context context, boolean show) {
@@ -143,7 +144,7 @@ public final class NavTabs {
 
     /** MEETUBE(app label): Settings > Customization > App label - the name in the brand pill. */
     public static String brandLabel(Context context) {
-        return com.newtube.mobile.ui.common.BrandLabel.or(prefs(context).getString("brand_label", null),
+        return com.newtube.mobile.ui.common.BrandLabel.or(PrefCache.getString(context, PREFS, "brand_label", null),
                 context.getString(com.liskovsoft.smartyoutubetv2.tv.R.string.app_name));
     }
 
@@ -154,12 +155,12 @@ public final class NavTabs {
     /** MEETUBE(search place): Settings > Customization > Tabs - Search in the top bar instead of the bottom one. */
     public static boolean searchOnTop(Context context) {
         // MEETUBE(youtube mode): Search sits in the top bar, as on YouTube.
-        return com.newtube.mobile.ui.common.YouTubeMode.isOn(context) || prefs(context).getBoolean(KEY_SEARCH_ON_TOP, false);
+        return com.newtube.mobile.ui.common.YouTubeMode.isOn(context) || PrefCache.getBoolean(context, PREFS, KEY_SEARCH_ON_TOP, false);
     }
 
     /** MEETUBE(search fab): the floating Search, out while the bar is slid away, at the left corner (else the right). */
     public static boolean searchFabLeft(Context context) {
-        return prefs(context).getBoolean(KEY_SEARCH_FAB_LEFT, false);
+        return PrefCache.getBoolean(context, PREFS, KEY_SEARCH_FAB_LEFT, false);
     }
 
     public static void setSearchFabLeft(Context context, boolean left) {
@@ -168,7 +169,7 @@ public final class NavTabs {
 
     /** MEETUBE(issue #181): the top pills stay while a feed scrolls; off (default) they slide away like the bottom bar. */
     public static boolean topBarAlwaysShown(Context context) {
-        return prefs(context).getBoolean(KEY_TOP_BAR_PINNED, false);
+        return PrefCache.getBoolean(context, PREFS, KEY_TOP_BAR_PINNED, false);
     }
 
     public static void setTopBarAlwaysShown(Context context, boolean shown) {
@@ -177,7 +178,7 @@ public final class NavTabs {
 
     /** Where Search sits in the bottom bar: how many of the two tabs come before it (0 to 2). */
     public static int searchPosition(Context context) {
-        return prefs(context).getInt(KEY_SEARCH_POSITION, 1);
+        return PrefCache.getInt(context, PREFS, KEY_SEARCH_POSITION, 1);
     }
 
     /** The whole bar at once, as BarEditor's stack reads after a drag. */

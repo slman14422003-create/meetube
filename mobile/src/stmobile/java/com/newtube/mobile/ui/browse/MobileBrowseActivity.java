@@ -314,6 +314,8 @@ public class MobileBrowseActivity extends MobileActivity
     private ProgressBar mMiniProgress;
     /** 500ms UI ticker while the bar is visible: progress line, play/pause icon, liveness check. */
     private final Runnable mMiniPlayerTick = this::onMiniPlayerTick;
+    private int mMiniLastProgress = -1;
+    private int mMiniLastKey = Integer.MIN_VALUE;
     private float[] mMiniPlace; // the card's dragged place, kept while the app is away (onStop)
     private int mMiniPlaceSession;
     /**
@@ -395,6 +397,7 @@ public class MobileBrowseActivity extends MobileActivity
         // mini card; ordinary navigation still uses BrowseWindowAnimation's quick fade.
 
         setContentView(R.layout.activity_mobile_browse);
+        com.newtube.mobile.perf.JankProbe.attach(this); // debug and benchmark builds only
         com.newtube.mobile.ui.common.LaunchSplash.play(this);
         MediaServiceManager.instance().addAccountListener(mAccountListener);
 
@@ -421,7 +424,18 @@ public class MobileBrowseActivity extends MobileActivity
 
         // NEWTUBE(downloads): keep the Downloads grid live (progress badges, finished files)
         // while it is the section on screen; see onDownloadsChanged.
-        DownloadRegistry.instance(this).addListener(mDownloadsListener);
+        // NEWTUBE(startup): the registry reads its file on first use. Opening it and adding the
+        // listener wait for the first frame and run on the deferral worker; the listener only
+        // matters while the Downloads grid shows, which loads its own list through the bridge.
+        final android.content.Context appContext = getApplicationContext();
+        afterFirstDrawOffMain(() -> {
+            DownloadRegistry registry = DownloadRegistry.instance(appContext);
+            runOnUiThread(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    registry.addListener(mDownloadsListener);
+                }
+            });
+        });
         handleOpenDownloads(getIntent());
 
         // NEWTUBE(update-flow): a known update puts a dot on the You tab and a row at the top of
@@ -434,10 +448,23 @@ public class MobileBrowseActivity extends MobileActivity
         // the media-playback notification never shows on a fresh install. Ask plainly on every
         // cold start until granted; the framework itself stops showing the dialog after two
         // denials, so no extra bookkeeping (and no custom rationale UI) is needed.
-        if (Build.VERSION.SDK_INT >= 33
-                && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_POST_NOTIFICATIONS);
+        // NEWTUBE(startup): asked once Home has drawn, so the system dialog never covers or
+        // delays the first frame.
+        if (Build.VERSION.SDK_INT >= 33) {
+            com.newtube.mobile.StartupDeferral.afterFirstDraw(this, "notification-permission", () -> {
+                if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                            REQUEST_POST_NOTIFICATIONS);
+                }
+            });
         }
+    }
+
+    /** NEWTUBE(startup): {@code task} on a worker thread once this screen has drawn its first frame. */
+    private void afterFirstDrawOffMain(Runnable task) {
+        com.newtube.mobile.StartupDeferral.afterFirstDraw(this, "browse-worker-task", () ->
+                com.newtube.mobile.StartupDeferral.background("browse-worker-task", task));
     }
 
     private void bindViews() {
@@ -843,7 +870,7 @@ public class MobileBrowseActivity extends MobileActivity
         android.view.ViewPropertyAnimator exit = flyToX != null
                 ? mMiniPlayerBar.animate().translationX(flyToX).alpha(0f).setDuration(flyMs)
                         .setInterpolator(new android.view.animation.LinearInterpolator())
-                : mMiniPlayerBar.animate().alpha(0f).scaleX(0.9f).scaleY(0.9f)
+                : mMiniPlayerBar.animate().alpha(0f)
                         .setDuration(Motion.EXIT_MS).setInterpolator(Motion.EMPHASIZED_ACCELERATE);
         exit.withLayer().withEndAction(() -> {
                     if (mMiniClosing) {
@@ -913,6 +940,7 @@ public class MobileBrowseActivity extends MobileActivity
         mMiniControls.show();
         updateMiniPlayPauseIcon(player);
 
+        mMiniLastKey = Integer.MIN_VALUE;
         Utils.removeCallbacks(mMiniPlayerTick);
         Utils.postDelayed(mMiniPlayerTick, MINI_TICK_MS);
     }
@@ -1214,8 +1242,8 @@ public class MobileBrowseActivity extends MobileActivity
     }
 
     private void onMiniPlayerTick() {
-        com.newtube.mobile.ui.playback.MiniSize.bindText(this);
         if (mMiniPlayerBar.getVisibility() != View.VISIBLE) {
+            com.newtube.mobile.ui.playback.MiniSize.bindText(this);
             return;
         }
         ExoPlayer player = MiniPlayerBridge.getPlayer();
@@ -1233,10 +1261,21 @@ public class MobileBrowseActivity extends MobileActivity
         }
         long duration = player.getDuration();
         if (duration > 0) {
-            mMiniProgress.setProgress((int) (player.getCurrentPosition() * 1000 / duration));
+            int progress = (int) (player.getCurrentPosition() * 1000 / duration);
+            if (progress != mMiniLastProgress) {
+                mMiniLastProgress = progress;
+                mMiniProgress.setProgress(progress);
+            }
         }
-        updateMiniPlayPauseIcon(player);
-        MiniPlayerBridge.fitToVideo(mMiniPlayerFrame); // an autoplayed next video may have another shape
+        int key = (player.getPlayWhenReady() ? 1 : 0) | (player.getPlaybackState() << 1)
+                | (com.newtube.mobile.ui.playback.MobilePlaybackActivity.sAudioOnly ? 1 << 4 : 0)
+                | (System.identityHashCode(MiniPlayerBridge.getVideo()) << 5);
+        if (key != mMiniLastKey) {
+            mMiniLastKey = key;
+            com.newtube.mobile.ui.playback.MiniSize.bindText(this);
+            updateMiniPlayPauseIcon(player);
+            MiniPlayerBridge.fitToVideo(mMiniPlayerFrame); // an autoplayed next video may have another shape
+        }
         Utils.postDelayed(mMiniPlayerTick, MINI_TICK_MS);
     }
 
@@ -3961,6 +4000,11 @@ public class MobileBrowseActivity extends MobileActivity
     @Override
     protected void onResume() {
         super.onResume();
+        mMiniLastKey = Integer.MIN_VALUE;
+        if (mMiniPlayerBar != null && mMiniPlayerBar.getVisibility() == View.VISIBLE) {
+            Utils.removeCallbacks(mMiniPlayerTick);
+            Utils.postDelayed(mMiniPlayerTick, 0);
+        }
         mPreview.schedule();
         mTopBar.syncMark(this);
         syncMeeTuneHint(); // MEETUNE
@@ -4124,6 +4168,7 @@ public class MobileBrowseActivity extends MobileActivity
     @Override
     protected void onPause() {
         super.onPause();
+        Utils.removeCallbacks(mMiniPlayerTick);
         mPreview.stop();
         mBottomNav.removeCallbacks(mLeaveShortsTab);
 

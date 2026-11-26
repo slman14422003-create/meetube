@@ -49,6 +49,29 @@ public final class Motion {
         pop(view, 0.78f, 1.12f);
     }
 
+    /** True when {@code view} is, or holds, a glass that samples and blurs the page (it must not move or scale). */
+    public static boolean holdsLiveGlass(android.view.View view) {
+        if (view instanceof GlassView) {
+            return ((GlassView) view).isLive();
+        }
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                if (holdsLiveGlass(group.getChildAt(i))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static void fadePop(android.view.View view) {
+        view.animate().cancel();
+        view.animate().alpha(0.6f).setDuration(POP_MS / 3).setInterpolator(STANDARD).withLayer()
+                .withEndAction(() -> view.animate().alpha(1f).setDuration(POP_MS * 2 / 3).setInterpolator(STANDARD).withLayer().start())
+                .start();
+    }
+
     /**
      * MEETUBE(frost): {@code view} arrives out of frosted glass - it fades in while its blur clears,
      * on the GPU (RenderEffect, Android 12+; older ones get the fade alone). The blur is cleared at
@@ -59,8 +82,8 @@ public final class Motion {
         view.animate().cancel();
         view.setAlpha(0f);
         view.animate().alpha(1f).setDuration(FROST_MS).setInterpolator(EMPHASIZED_DECELERATE).withLayer().start();
-        if (android.os.Build.VERSION.SDK_INT < 31) {
-            return;
+        if (android.os.Build.VERSION.SDK_INT < 31 || holdsLiveGlass(view)) {
+            return; // alpha only: a blur over live glass re-blurs every child per frame
         }
         stopFrost(view);
         float radius = FROST_BLUR_DP * view.getResources().getDisplayMetrics().density;
@@ -156,6 +179,10 @@ public final class Motion {
 
     private static void pop(android.view.View view, float in, float over) {
         if (view == null) {
+            return;
+        }
+        if (holdsLiveGlass(view)) {
+            fadePop(view);
             return;
         }
         android.animation.Keyframe k0 = android.animation.Keyframe.ofFloat(0f, 1f);

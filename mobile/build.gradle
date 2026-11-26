@@ -210,9 +210,8 @@ android {
     
     buildTypes {
         release {
-            // Enable minification
-            // shrinkResources true
-            // minifyEnabled true
+            minifyEnabled true
+            shrinkResources true
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
@@ -242,8 +241,9 @@ android {
         benchmark {
             initWith release
             debuggable false
-            // Retain the production no-minification contract while measuring release code.
-            minifyEnabled false
+            // Measure the same shrunk code the release ships.
+            minifyEnabled true
+            shrinkResources true
             matchingFallbacks = ['release']
             buildConfigField "boolean", "BENCHMARK", "true"
             // Match the existing debug install identity; never require uninstalling user data.
@@ -268,6 +268,10 @@ android {
         androidTest.assets.srcDir layout.buildDirectory.dir('generated/sabrComparisonAssets').get().asFile
         // Reuse the generated offline media fixture only in the benchmark APK, never release.
         benchmark.assets.srcDir 'src/debug/assets'
+        // JankStats probe for the macrobenchmark jank check: debug and benchmark only. Release
+        // compiles the no-op twin in src/release, so nothing of it ships.
+        debug.java.srcDir 'src/jank/java'
+        benchmark.java.srcDir 'src/jank/java'
     }
 
     packagingOptions {
@@ -375,6 +379,9 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     implementation 'androidx.annotation:annotation:' + annotationXVersion
+    // Frame/jank tracking for the macrobenchmark jank check (see src/jank); not in release.
+    debugImplementation 'androidx.metrics:metrics-performance:1.0.0-beta01'
+    benchmarkImplementation 'androidx.metrics:metrics-performance:1.0.0-beta01'
     implementation 'androidx.work:work-runtime:' + workVersion // MEETUBE(auto download): already common's, compiled against here
     implementation 'androidx.activity:activity:' + activityXVersion
     implementation 'androidx.lifecycle:lifecycle-runtime:' + liveDataVersion

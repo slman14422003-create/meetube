@@ -94,6 +94,9 @@ public final class LiveRingView extends View {
         float cy = h / 2f;
         float size = Math.min(w, h);
         float outer = size / 2f;
+        if (outer <= 0f) {
+            return;
+        }
         float glow = glow(size, mDensity);
         float stroke = stroke(size, mDensity);
         mRingRadius = outer - glow - stroke / 2f;
@@ -138,7 +141,7 @@ public final class LiveRingView extends View {
     }
 
     private void syncLoop() {
-        boolean run = mShown && hasWindowFocus();
+        boolean run = mShown && isAttachedToWindow() && hasWindowFocus() && AnimGate.allowed();
         if (run && mLoop == null) {
             mLoop = ValueAnimator.ofFloat(0f, 1f);
             mLoop.setDuration(LOOP_MS);
@@ -148,10 +151,22 @@ public final class LiveRingView extends View {
                 mPhase = (float) a.getAnimatedValue();
                 invalidate();
             });
-            mLoop.start();
-        } else if (!run && mLoop != null) {
+        }
+        AnimGate.sync(mLoop, run);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        syncLoop();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (mLoop != null) {
             mLoop.cancel();
             mLoop = null;
         }
+        super.onDetachedFromWindow();
     }
 }

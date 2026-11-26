@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,6 +48,7 @@ final class HomeRowsAdapter extends RecyclerView.Adapter<HomeRowsAdapter.RowHold
         mClick = click;
         mLongClick = longClick;
         setHasStableIds(true);
+        VideoCardAdapter.sizePool(mCardPool, 12);
     }
 
     void submit(List<Video> videos) {
@@ -69,8 +71,49 @@ final class HomeRowsAdapter extends RecyclerView.Adapter<HomeRowsAdapter.RowHold
             row.videos.add(video);
             row.feedCards++;
         }
+        List<Row> old = mRows;
         mRows = rows;
-        notifyDataSetChanged();
+        DiffUtil.calculateDiff(new RowDiff(old, rows), false).dispatchUpdatesTo(this);
+    }
+
+    private static final class RowDiff extends DiffUtil.Callback {
+        private final List<Row> mOld;
+        private final List<Row> mNew;
+
+        RowDiff(List<Row> oldRows, List<Row> newRows) {
+            mOld = oldRows;
+            mNew = newRows;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return mOld.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return mNew.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldPosition, int newPosition) {
+            return oldPosition == newPosition && TextUtils.equals(mOld.get(oldPosition).title, mNew.get(newPosition).title);
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldPosition, int newPosition) {
+            Row a = mOld.get(oldPosition);
+            Row b = mNew.get(newPosition);
+            if (a.feedCards != b.feedCards || a.videos.size() != b.videos.size()) {
+                return false;
+            }
+            for (int i = 0; i < a.videos.size(); i++) {
+                if (a.videos.get(i) != b.videos.get(i)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     /** Cards in rows [0, row]: the feed position the grid's paging logic expects. */
@@ -152,8 +195,11 @@ final class HomeRowsAdapter extends RecyclerView.Adapter<HomeRowsAdapter.RowHold
                 }
             }.strip();
             RecyclerView strip = new RecyclerView(context);
-            strip.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false));
+            LinearLayoutManager strips = new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false);
+            strips.setInitialPrefetchItemCount(4);
+            strip.setLayoutManager(strips);
             strip.setRecycledViewPool(mCardPool);
+            strip.setItemViewCacheSize(4);
             strip.setNestedScrollingEnabled(false);
             strip.setClipToPadding(false);
             strip.setPadding(Math.round(8 * density), 0, Math.round(8 * density), 0); // + a card's 8dp margin = the 16dp gutter

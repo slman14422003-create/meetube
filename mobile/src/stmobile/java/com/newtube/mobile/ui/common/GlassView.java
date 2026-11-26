@@ -25,6 +25,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
@@ -141,6 +142,44 @@ public class GlassView extends FrameLayout {
             + "    return color;\n"
             + "}\n";
 
+    /** Three taps (red, green, blue) instead of seven: the same bend, a coarser dispersion. */
+    static final String REFRACTION_LITE_AGSL =
+            "uniform shader content;\n"
+            + "uniform float2 size;\n"
+            + "uniform float radius;\n"
+            + "uniform float refractionHeight;\n"
+            + "uniform float refractionAmount;\n"
+            + "uniform float depthEffect;\n"
+            + "uniform float chromaticAberration;\n"
+            + ROUNDED_RECT_SDF
+            + "float circleMap(float x) {\n"
+            + "    return 1.0 - sqrt(1.0 - x * x);\n"
+            + "}\n"
+            + "half4 main(float2 coord) {\n"
+            + "    float2 halfSize = size * 0.5;\n"
+            + "    float2 centeredCoord = coord - halfSize;\n"
+            + "    float sd = sdRoundedRect(centeredCoord, halfSize, radius);\n"
+            + "    if (-sd >= refractionHeight) {\n"
+            + "        return content.eval(coord);\n"
+            + "    }\n"
+            + "    sd = min(sd, 0.0);\n"
+            + "    float d = circleMap(1.0 - -sd / refractionHeight) * refractionAmount;\n"
+            + "    float gradRadius = min(radius * 1.5, min(halfSize.x, halfSize.y));\n"
+            + "    float2 grad = normalize(gradSdRoundedRect(centeredCoord, halfSize, gradRadius)"
+            + " + depthEffect * normalize(centeredCoord));\n"
+            + "    float2 refractedCoord = coord + d * grad;\n"
+            + "    float dispersionIntensity = chromaticAberration"
+            + " * ((centeredCoord.x * centeredCoord.y) / (halfSize.x * halfSize.y));\n"
+            + "    float2 dispersedCoord = d * grad * dispersionIntensity;\n"
+            + "    half4 r = content.eval(refractedCoord + dispersedCoord);\n"
+            + "    half4 g = content.eval(refractedCoord);\n"
+            + "    half4 b = content.eval(refractedCoord - dispersedCoord);\n"
+            + "    return half4(r.r, g.g, b.b, g.a);\n"
+            + "}\n";
+
+    /** Glass this big (of the screen) bends nothing the eye can read, and a shader over it costs the most. */
+    private static final float LENS_MAX_SCREEN_SHARE = 0.4f;
+
     private static final String HIGHLIGHT_AGSL =
             "uniform float2 size;\n"
             + "uniform float radius;\n"
@@ -165,6 +204,7 @@ public class GlassView extends FrameLayout {
     private int mTint;
     /** Liquid: lens and specular rim (floating pills). Off: a flat frosted bar (top bar). */
     private boolean mLiquid;
+    private boolean mPlain;
     private final float mDensity;
     private final Paint mTintPaint = new Paint();
     private final Paint mNoisePaint = new Paint();
@@ -176,8 +216,14 @@ public class GlassView extends FrameLayout {
     private int mRecordedY = Integer.MIN_VALUE;
     private int mEffectW;
     private int mEffectH;
+    private int mEffectQuality = -1;
+    private int mLensQuality = -1;
     private int mReachTop;
     private int mReachBottom;
+    /** What the position was last compared at: the source's version and this view's place up the tree. */
+    private int mSeenVersion = -1;
+    private float mStampX = Float.NaN;
+    private float mStampY = Float.NaN;
 
     @Nullable private GlassSource mSource;
     /** Sits on glass already (glassOnGlass): its tint is drawn as given, see-through. */
@@ -194,7 +240,9 @@ public class GlassView extends FrameLayout {
     @Nullable private Object mHighlight;
 
     private final ViewTreeObserver.OnPreDrawListener mTrackPosition = () -> {
-        if (mSource != null && hasMoved()) {
+        GlassSource source = mSource;
+        if (source != null && mNode != null && isShown() && Glass.liveBlur() && changedSinceCheck(source)
+                && hasMoved()) {
             invalidate(); // re-record at the new offset; content changes need no help
         }
         return true;
@@ -212,6 +260,10 @@ public class GlassView extends FrameLayout {
         mTint = a.getColor(R.styleable.GlassView_glassTint, 0x66121212);
         mLiquid = a.getBoolean(R.styleable.GlassView_glassLiquid, true) && Glass.isLiquid(context);
         mOnGlass = a.getBoolean(R.styleable.GlassView_glassOnGlass, false);
+        mPlain = a.getBoolean(R.styleable.GlassView_glassPlain, false);
+        if (mPlain) {
+            mOnGlass = true;
+        }
         mMaxWidth = a.getDimensionPixelSize(R.styleable.GlassView_glassMaxWidth, 0);
         mFadeBottom = a.getDimensionPixelSize(R.styleable.GlassView_glassFadeBottom, 0);
         a.recycle();
@@ -311,7 +363,19 @@ public class GlassView extends FrameLayout {
         return mTint;
     }
 
+    public boolean isPlain() {
+        return mPlain;
+    }
+
+    /** True while this glass samples and blurs the page under it (a source is wired and it is not plain). */
+    public boolean isLive() {
+        return !mPlain && mSource != null && Glass.liveBlur();
+    }
+
     public void setPlain() {
+        mPlain = true;
+        mSource = null;
+        mNode = null;
         mTint = 0;
         mLiquid = false;
         mOnGlass = true; // the tint as given, transparent, never the opaque no-backdrop fill
@@ -348,11 +412,16 @@ public class GlassView extends FrameLayout {
 
     /** The page this glass frosts; it must not contain this view. */
     public void setSource(@Nullable GlassSource source) {
+        if (mPlain) {
+            mSource = null;
+            return;
+        }
         mSource = source;
         if (source != null && source.node != null && mNode == null) {
             mNode = new RenderNode("MeeTube glass");
         }
         mRecordedX = Integer.MIN_VALUE;
+        mSeenVersion = -1;
         invalidate();
     }
 
@@ -398,7 +467,7 @@ public class GlassView extends FrameLayout {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         boolean live = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && mNode != null && mSource != null
-                && !BatterySaver.lite() // MEETUBE(issue #93): the tint alone
+                && Glass.liveBlur() // MEETUBE(issue #93): the tint alone
                 && mSource.node != null && canvas.isHardwareAccelerated() && getWidth() > 0 && getHeight() > 0;
         // The frost (not the bar's children) in a layer, so its bottom can be faded out below.
         int faded = mFadeBottom > 0 ? canvas.saveLayer(0, 0, getWidth(), getHeight(), null) : -1;
@@ -427,15 +496,18 @@ public class GlassView extends FrameLayout {
     @RequiresApi(api = Build.VERSION_CODES.S)
     private void drawBackdrop(Canvas canvas) {
         RenderNode node = mNode;
-        hasMoved();
+        if (mRecordedX == Integer.MIN_VALUE || changedSinceCheck(mSource)) {
+            hasMoved();
+        }
         mRecordedX = mLoc[0] - mSourceLoc[0];
         mRecordedY = mLoc[1] - mSourceLoc[1];
         int w = getWidth();
         int h = getHeight();
         node.setPosition(0, -mReachTop, w, h + mReachBottom);
-        if (w != mEffectW || h != mEffectH) {
+        if (w != mEffectW || h != mEffectH || mEffectQuality != Glass.quality()) {
             mEffectW = w;
             mEffectH = h;
+            mEffectQuality = Glass.quality();
             node.setRenderEffect(effect(w, h));
         }
         Canvas recording = node.beginRecording();
@@ -459,10 +531,14 @@ public class GlassView extends FrameLayout {
         saturate.setSaturation(SATURATION);
         RenderEffect frost = RenderEffect.createBlurEffect(blur, blur,
                 RenderEffect.createColorFilterEffect(new ColorMatrixColorFilter(saturate)), Shader.TileMode.CLAMP);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || !mLiquid) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || !mLiquid || mOnGlass || !lensAllowed(w, h)) {
             return frost;
         }
-        if (mLens == null) mLens = new RuntimeShader(REFRACTION_AGSL); // MEETUNE(fold): compiled once
+        int quality = Glass.quality();
+        if (mLens == null || mLensQuality != quality) { // MEETUNE(fold): compiled once per quality
+            mLens = new RuntimeShader(quality == Glass.QUALITY_FULL ? REFRACTION_AGSL : REFRACTION_LITE_AGSL);
+            mLensQuality = quality;
+        }
         RuntimeShader lens = (RuntimeShader) mLens;
         lens.setFloatUniform("size", w, h);
         lens.setFloatUniform("radius", radius(w, h));
@@ -471,6 +547,15 @@ public class GlassView extends FrameLayout {
         lens.setFloatUniform("depthEffect", 1f);
         lens.setFloatUniform("chromaticAberration", 1f);
         return RenderEffect.createChainEffect(RenderEffect.createRuntimeShaderEffect(lens, "content"), frost);
+    }
+
+    /** The lens is for pills and bars: not at Flat, and not over a big part of the screen. */
+    private boolean lensAllowed(int w, int h) {
+        if (Glass.quality() == Glass.QUALITY_FLAT) {
+            return false;
+        }
+        android.util.DisplayMetrics metrics = getResources().getDisplayMetrics();
+        return (long) w * h <= LENS_MAX_SCREEN_SHARE * metrics.widthPixels * metrics.heightPixels;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -498,13 +583,41 @@ public class GlassView extends FrameLayout {
         return radius(getWidth(), getHeight());
     }
 
+    /**
+     * Cheap change test, plain field reads only: true when the source's version moved or this view
+     * (or anything above it) sits somewhere else than at the last test. Only then is the window
+     * position worth looking up.
+     */
+    private boolean changedSinceCheck(@NonNull GlassSource source) {
+        int version = source.version();
+        float x = 0f;
+        float y = 0f;
+        View v = this;
+        while (true) {
+            x += v.getLeft() + v.getTranslationX() - v.getScrollX();
+            y += v.getTop() + v.getTranslationY() - v.getScrollY();
+            ViewParent parent = v.getParent();
+            if (!(parent instanceof View)) {
+                break;
+            }
+            v = (View) parent;
+        }
+        if (version == mSeenVersion && x == mStampX && y == mStampY) {
+            return false;
+        }
+        mSeenVersion = version;
+        mStampX = x;
+        mStampY = y;
+        return true;
+    }
+
     /** Refreshes the on-screen offsets; true when they differ from the last recording. */
     private boolean hasMoved() {
         if (mSource == null) {
             return false;
         }
         getLocationInWindow(mLoc);
-        mSource.getLocationInWindow(mSourceLoc);
+        mSource.windowLocation(mSourceLoc);
         return mLoc[0] - mSourceLoc[0] != mRecordedX || mLoc[1] - mSourceLoc[1] != mRecordedY;
     }
 

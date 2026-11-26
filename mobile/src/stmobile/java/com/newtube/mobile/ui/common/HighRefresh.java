@@ -23,7 +23,7 @@ public final class HighRefresh {
     }
 
     public static boolean isEnabled(Context context) {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY, false);
+        return PrefCache.getBoolean(context, PREFS, KEY, false);
     }
 
     public static void setEnabled(Context context, boolean on) {

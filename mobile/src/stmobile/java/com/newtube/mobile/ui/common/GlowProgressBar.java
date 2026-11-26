@@ -90,6 +90,7 @@ public class GlowProgressBar extends ProgressBar {
         private static final float FLATTEN = 0.6f;
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint mCapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final int[] mStopColors = new int[FALLOFF.length];
         private int mColor;
         private float mRadius;
         private float mX;
@@ -146,21 +147,20 @@ public class GlowProgressBar extends ProgressBar {
             if (!enabled(context) || radius <= 0f) {
                 return;
             }
-            if (color != mPaint.getColor() || radius != mRadius || mPaint.getShader() == null) {
+            if (color != mPaint.getColor() || mPaint.getShader() == null) {
                 mPaint.setColor(color);
-                mRadius = radius;
                 int rgb = color & 0x00FFFFFF;
                 int alpha = Color.alpha(color) * HEART_ALPHA / 255;
-                int[] colors = new int[FALLOFF.length];
-                for (int i = 0; i < colors.length; i++) {
-                    colors[i] = rgb | Math.round(alpha * FALLOFF[i]) << 24;
+                for (int i = 0; i < mStopColors.length; i++) {
+                    mStopColors[i] = rgb | Math.round(alpha * FALLOFF[i]) << 24;
                 }
-                mPaint.setShader(new RadialGradient(0f, 0f, radius, colors, STOPS, Shader.TileMode.CLAMP));
+                mPaint.setShader(new RadialGradient(0f, 0f, 1f, mStopColors.clone(), STOPS, Shader.TileMode.CLAMP));
             }
+            mRadius = radius;
             int save = canvas.save();
             canvas.translate(x, cy);
-            canvas.scale(1f, FLATTEN);
-            canvas.drawCircle(0f, 0f, radius, mPaint);
+            canvas.scale(radius, radius * FLATTEN);
+            canvas.drawCircle(0f, 0f, 1f, mPaint);
             canvas.restoreToCount(save);
         }
 

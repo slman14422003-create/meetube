@@ -71,8 +71,7 @@ public final class NavHider extends RecyclerView.OnScrollListener {
 
     /** MEETUBE(fixed bars): Customization > Bars, Fixed Top Bar / Fixed Nav Bar; off by default. */
     public static boolean isFixed(android.content.Context context, boolean top) {
-        return context.getApplicationContext().getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
-                .getBoolean(top ? "top" : "nav", false);
+        return PrefCache.getBoolean(context, PREFS, top ? "top" : "nav", false);
     }
 
     public static void setFixed(android.content.Context context, boolean top, boolean fixed) {

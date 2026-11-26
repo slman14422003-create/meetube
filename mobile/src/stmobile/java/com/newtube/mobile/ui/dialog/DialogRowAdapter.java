@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -122,12 +123,54 @@ class DialogRowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      */
     void submit(List<OptionCategory> categories, Map<OptionCategory, OptionItem> radioOverrides,
                 @Nullable CharSequence sheetTitle) {
-        mRows = build(categories, radioOverrides, sheetTitle);
+        List<Row> old = mRows;
+        boolean oldIconColumn = mIconColumn;
+        List<Row> next = build(categories, radioOverrides, sheetTitle);
+        mRows = next;
         mIconColumn = false;
-        for (Row row : mRows) {
+        for (Row row : next) {
             mIconColumn |= row.viewType == TYPE_BUTTON && iconFor(row.title) != 0;
         }
-        notifyDataSetChanged();
+        DiffUtil.calculateDiff(new RowDiff(old, next), false).dispatchUpdatesTo(this);
+        if (oldIconColumn != mIconColumn && !next.isEmpty()) {
+            notifyItemRangeChanged(0, next.size()); // every action row's icon room moved
+        }
+    }
+
+    private static final class RowDiff extends DiffUtil.Callback {
+        private final List<Row> mOld;
+        private final List<Row> mNew;
+
+        RowDiff(List<Row> oldRows, List<Row> newRows) {
+            mOld = oldRows;
+            mNew = newRows;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return mOld.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return mNew.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldPosition, int newPosition) {
+            Row a = mOld.get(oldPosition);
+            Row b = mNew.get(newPosition);
+            return a.viewType == b.viewType && a.item == b.item && a.category == b.category
+                    && android.text.TextUtils.equals(a.title, b.title);
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldPosition, int newPosition) {
+            Row a = mOld.get(oldPosition);
+            Row b = mNew.get(newPosition);
+            return a.checked == b.checked && android.text.TextUtils.equals(a.title, b.title)
+                    && android.text.TextUtils.equals(a.subtitle, b.subtitle);
+        }
     }
 
     /**

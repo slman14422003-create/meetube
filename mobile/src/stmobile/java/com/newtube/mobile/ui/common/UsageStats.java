@@ -69,7 +69,9 @@ public final class UsageStats {
 
     public static void install(Application app) {
         sPrefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        prune();
+        // NEWTUBE(startup): getAll() waits for the prefs file to load; old days are not read by
+        // the first screen, so drop them after the first frame, off the main thread.
+        com.newtube.mobile.StartupDeferral.background("usage-prune", UsageStats::prune);
         app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override public void onActivityStarted(@NonNull Activity activity) {
                 sStarted.add(activity);

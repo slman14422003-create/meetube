@@ -52,6 +52,10 @@ public final class NavBloom extends Drawable {
     private final BottomNavigationView mBar;
     private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Rect mRect = new Rect();
+    private final int[] mStopColors = new int[FALLOFF.length];
+    private final android.graphics.Matrix mShaderMatrix = new android.graphics.Matrix();
+    @Nullable private RadialGradient mShader;
+    private int mShaderRgb;
     private final float mRadius;
     @Nullable private ValueAnimator mAnimator;
     private int mItemId;
@@ -249,11 +253,18 @@ public final class NavBloom extends Drawable {
         int alpha = Math.round(HEART_ALPHA * mSwell);
         int rgb = mColor & 0x00FFFFFF;
         // An eased (Gaussian-like) falloff: two straight ramps met in a ring the eye picks out.
-        int[] colors = new int[FALLOFF.length];
-        for (int i = 0; i < colors.length; i++) {
-            colors[i] = rgb | (Math.round(alpha * FALLOFF[i]) << 24);
+        if (mShader == null || mShaderRgb != rgb) {
+            for (int i = 0; i < mStopColors.length; i++) {
+                mStopColors[i] = rgb | (Math.round(255 * FALLOFF[i]) << 24);
+            }
+            mShader = new RadialGradient(0f, 0f, 1f, mStopColors.clone(), null, Shader.TileMode.CLAMP);
+            mShaderRgb = rgb;
+            mPaint.setShader(mShader);
         }
-        mPaint.setShader(new RadialGradient(mCx, mCy, r, colors, null, Shader.TileMode.CLAMP));
+        mShaderMatrix.setScale(r, r);
+        mShaderMatrix.postTranslate(mCx, mCy);
+        mShader.setLocalMatrix(mShaderMatrix);
+        mPaint.setAlpha(alpha);
         canvas.save();
         canvas.scale(1f, FLATTEN, mCx, mCy);
         canvas.drawCircle(mCx, mCy, r, mPaint);

@@ -238,6 +238,7 @@ public class MobileMainApplication extends MainApplication {
         // Release-visible launch milestones + the "first frame drawn" hook used below.
         LaunchMilestones.install(this);
         com.newtube.mobile.ui.common.UsageStats.install(this); // MEETUBE(stats): time spent, for the greeting
+        com.newtube.mobile.ui.common.Glass.init(this);
         com.newtube.mobile.ui.common.BatterySaver.install(this); // MEETUBE(issue #93)
         com.newtube.mobile.ui.common.FocusTimer.install(this); // MEETUBE(focus): the greeting's Focus pill
 
@@ -257,7 +258,8 @@ public class MobileMainApplication extends MainApplication {
         // NETWORK FORENSICS (mobile-only): observe default-network replacements/capability changes
         // so a Wi-Fi -> 5G transition can be correlated with URL remints, media errors and ABR
         // resets. The monitor is read-only and logs no SSID, carrier, IP, DNS or account data.
-        NetworkDiagnostics.start(this);
+        // NEWTUBE(startup): after the first frame, on the deferral worker; it only logs.
+        StartupDeferral.background("network-diagnostics", () -> NetworkDiagnostics.start(this));
 
         // DIAGNOSTIC LOG (mobile-only): keep this app's own recent logcat lines in memory so
         // About > "Send diagnostic log" still holds a failure minutes later. Its own thread, and
@@ -801,10 +803,14 @@ public class MobileMainApplication extends MainApplication {
                                 context != null ? context : MobileMainApplication.this);
                     }
                 });
-        // MEETUBE(update notify): a new version shows up in the notification shade, app closed or not
-        com.newtube.mobile.update.UpdateNotifyWorker.schedule(this);
-        // MEETUBE(issue #220): new uploads from subscriptions in the notification shade
-        com.newtube.mobile.notify.NewUploadsWorker.schedule(this);
+        // NEWTUBE(startup): WorkManager's first getInstance opens its database; nothing here is
+        // needed by the first frame, so both schedules run after it, off the main thread.
+        StartupDeferral.background("work-schedule", () -> {
+            // MEETUBE(update notify): a new version shows up in the notification shade, app closed or not
+            com.newtube.mobile.update.UpdateNotifyWorker.schedule(this);
+            // MEETUBE(issue #220): new uploads from subscriptions in the notification shade
+            com.newtube.mobile.notify.NewUploadsWorker.schedule(this);
+        });
 
         // FEED FIRST-PAINT (mobile-only, round 2): Home's eager row-pad continuations exist to
         // fill short TV shelf rows to MIN_ROW_GROUP_SIZE=5; the phone flattens every row into one
@@ -983,7 +989,9 @@ public class MobileMainApplication extends MainApplication {
         // handover, VPN up/down). Nothing signals it, so the next call takes a pooled half-open
         // socket and stalls for the full read timeout - and they all stall, together. Drop the pool
         // the moment the default network changes.
-        startConnectionPoolEviction();
+        // NEWTUBE(startup): registering the callback is not needed for the first frame. The
+        // monitor still skips the first onAvailable, so the preconnect above is never evicted.
+        StartupDeferral.background("pool-eviction", this::startConnectionPoolEviction);
 
         // NOTE(in-stream ABR): "Auto" quality mapping to real adaptive selection is native on
         // media3 (a preset becomes maxVideoSize/frameRate constraints under which

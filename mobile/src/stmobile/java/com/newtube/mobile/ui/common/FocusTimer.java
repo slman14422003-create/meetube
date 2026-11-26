@@ -138,7 +138,7 @@ public final class FocusTimer {
      */
     public static androidx.appcompat.app.AlertDialog frosted(MaterialAlertDialogBuilder builder) {
         Context context = builder.getContext();
-        boolean blur = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S && !BatterySaver.lite()
+        boolean blur = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S && Glass.liveBlur()
                 && context.getSystemService(android.view.WindowManager.class).isCrossWindowBlurEnabled();
         float dp = context.getResources().getDisplayMetrics().density;
         if (blur) {
