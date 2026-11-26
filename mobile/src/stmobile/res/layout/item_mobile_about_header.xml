@@ -88,7 +88,7 @@
                 android:textColor="#4ADE80"
                 android:textSize="12sp" />
 
-            <TextView
+            <com.newtube.mobile.ui.common.BlinkView
                 android:id="@+id/about_cursor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

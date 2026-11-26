@@ -170,6 +170,7 @@
             android:layout_marginStart="4dp"
             app:glassCornerRadius="22dp"
             app:glassOnGlass="true"
+            app:glassPlain="true"
             app:glassTint="@color/meetube_search_glass_tint">
 
             <ImageButton
@@ -191,6 +192,7 @@
             android:layout_weight="1"
             app:glassCornerRadius="22dp"
             app:glassOnGlass="true"
+            app:glassPlain="true"
             app:glassTint="@color/meetube_search_glass_tint">
 
             <LinearLayout
@@ -253,6 +255,7 @@
             android:layout_marginEnd="4dp"
             app:glassCornerRadius="22dp"
             app:glassOnGlass="true"
+            app:glassPlain="true"
             app:glassTint="@color/meetube_search_glass_tint">
 
             <ImageButton

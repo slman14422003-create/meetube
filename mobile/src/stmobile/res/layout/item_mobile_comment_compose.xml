@@ -27,15 +27,14 @@
 
     <!-- MEETUBE(glass): a liquid-glass pill (see-through tint, grain, specular rim) on the comments
          sheet's frosted glass, which shows through it. -->
-    <com.newtube.mobile.ui.common.GlassView
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="44dp"
         android:layout_marginStart="12dp"
         android:layout_weight="1"
         android:duplicateParentState="true"
-        app:glassCornerRadius="22dp"
-        app:glassOnGlass="true"
-        app:glassTint="@color/meetube_glass_pill_tint">
+        android:background="@drawable/meetube_static_pill_r22"
+        android:clipToOutline="true">
 
         <TextView
             android:id="@+id/comment_compose_field"
@@ -52,6 +51,6 @@
             android:textColor="@color/mobile_color_on_surface_secondary"
             android:textSize="15sp" />
 
-    </com.newtube.mobile.ui.common.GlassView>
+    </FrameLayout>
 
 </LinearLayout>

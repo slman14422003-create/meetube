@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- MEETUBE(focus): the greeting's Focus pill (FocusTimer). The label picks the minutes, the round
-     button starts or stops; running, the label counts down. -->
 <com.newtube.mobile.ui.common.GlassView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="230dp"
-    android:layout_height="52dp"
-    android:layout_gravity="center_horizontal"
-    android:layout_marginTop="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/greet_pill_height"
+    android:layout_marginTop="10dp"
     android:clickable="true"
-    app:glassCornerRadius="16dp"
+    app:glassCornerRadius="20dp"
     app:glassOnGlass="true"
     app:glassTint="@color/meetube_greet_glass_tint">
 
@@ -26,20 +23,23 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackground"
             android:drawableStart="@drawable/ic_mobile_focus_timer"
-            android:drawablePadding="16dp"
+            android:drawablePadding="14dp"
             android:drawableTint="@color/mobile_color_on_surface"
+            android:ellipsize="end"
             android:fontFeatureSettings="tnum"
             android:gravity="center_vertical"
-            android:paddingStart="22dp"
+            android:maxLines="1"
+            android:paddingStart="20dp"
+            android:paddingEnd="8dp"
             android:textColor="@color/mobile_color_on_surface"
             android:textSize="16sp"
-            tools:text="Focus · 25 min" />
+            tools:text="Timer · 25 min" />
 
         <ImageButton
             android:id="@+id/focus_toggle"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="6dp"
+            android:layout_marginEnd="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
             android:scaleType="fitCenter"

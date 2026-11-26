@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- MEETUBE(you page): a Library or Pinned row on the You tab, a full-width glass pill: bare icon,
      label, chevron. Wired in MobileBrowseActivity.youSectionRow(). -->
-<com.newtube.mobile.ui.common.GlassView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mobile_you_row_glass"
     android:layout_width="match_parent"
@@ -9,8 +9,8 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:glassCornerRadius="16dp"
-    app:glassTint="@color/meetube_glass_button">
+    android:background="@drawable/meetube_static_button_r16"
+    android:clipToOutline="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,4 +49,4 @@
 
     </LinearLayout>
 
-</com.newtube.mobile.ui.common.GlassView>
+</FrameLayout>
