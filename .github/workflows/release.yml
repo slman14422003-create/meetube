@@ -41,6 +41,28 @@ jobs:
         with:
           submodules: recursive
 
+      # The repo was uploaded without its submodule links (empty MediaServiceCore/ and SharedModules/),
+      # so checkout cannot fetch them. Clone them here at the commits the project was built with.
+      - name: Fetch submodules if missing
+        run: |
+          fetch() { # dir url sha
+            if [ -f "$1/core_settings.gradle" ]; then return 0; fi
+            rm -rf "$1"; mkdir -p "$1"
+            git -C "$1" init -q
+            git -C "$1" remote add origin "$2"
+            git -C "$1" fetch -q --depth=1 origin "$3"
+            git -C "$1" checkout -q FETCH_HEAD
+          }
+          fetch SharedModules https://github.com/yashoncode/SharedModules 5df06e82c76f76301307f293838b1bd6678560a1
+          fetch MediaServiceCore https://github.com/yashoncode/MediaServiceCore b83d2952a44664f8932726ef3b0811da63a594f1
+          # MediaServiceCore carries its own SharedModules submodule.
+          if [ ! -f MediaServiceCore/SharedModules/core_settings.gradle ]; then
+            rm -rf MediaServiceCore/SharedModules
+            git clone -q https://github.com/yuliskov/SharedModules MediaServiceCore/SharedModules
+            git -C MediaServiceCore/SharedModules checkout -q 17ea42b685b6196f22e5292f9ce121dc93207e14
+          fi
+          ls SharedModules/core_settings.gradle MediaServiceCore/core_settings.gradle
+
       - name: Set up JDK 21
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
