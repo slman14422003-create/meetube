@@ -86,7 +86,7 @@
         android:elevation="6dp"
         android:foreground="?attr/selectableItemBackground"
         android:visibility="gone"
-        app:glassCornerRadius="26dp"
+        app:glassCornerRadius="16dp"
         app:glassTint="@color/meetube_glass_tint"
         tools:visibility="visible">
 

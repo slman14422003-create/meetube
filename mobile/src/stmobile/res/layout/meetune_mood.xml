@@ -15,7 +15,7 @@
         android:layout_height="110dp"
         android:layout_marginHorizontal="18dp"
         android:alpha="0.45"
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="12dp"
         app:cardElevation="0dp">
 
         <ImageView
@@ -35,7 +35,7 @@
         android:layout_marginHorizontal="9dp"
         android:layout_marginTop="6dp"
         android:alpha="0.75"
-        app:cardCornerRadius="18dp"
+        app:cardCornerRadius="12dp"
         app:cardElevation="0dp">
 
         <ImageView
@@ -55,7 +55,7 @@
         android:layout_marginTop="12dp"
         android:duplicateParentState="true"
         android:foreground="?attr/selectableItemBackground"
-        app:cardCornerRadius="20dp"
+        app:cardCornerRadius="14dp"
         app:cardElevation="0dp"
         app:strokeColor="#38FFFFFF"
         app:strokeWidth="1dp">

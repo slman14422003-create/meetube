@@ -9,7 +9,7 @@
     android:layout_gravity="center_horizontal"
     android:layout_marginTop="12dp"
     android:clickable="true"
-    app:glassCornerRadius="26dp"
+    app:glassCornerRadius="16dp"
     app:glassOnGlass="true"
     app:glassTint="@color/meetube_greet_glass_tint">
 

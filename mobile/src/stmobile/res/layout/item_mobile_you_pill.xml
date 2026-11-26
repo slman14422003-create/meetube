@@ -9,7 +9,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:glassCornerRadius="24dp"
+    app:glassCornerRadius="16dp"
     app:glassTint="@color/meetube_glass_button">
 
     <LinearLayout

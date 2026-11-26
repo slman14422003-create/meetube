@@ -300,7 +300,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     app:cardBackgroundColor="@color/mobile_color_placeholder"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
                     app:rippleColor="@color/mobile_color_on_surface_secondary">
 

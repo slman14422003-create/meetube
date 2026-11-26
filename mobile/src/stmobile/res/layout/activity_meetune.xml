@@ -490,7 +490,7 @@
         android:layout_gravity="bottom"
         android:elevation="6dp"
         android:visibility="gone"
-        app:glassCornerRadius="28dp"
+        app:glassCornerRadius="18dp"
         app:glassTint="?attr/meetubeNavTint">
 
         <LinearLayout

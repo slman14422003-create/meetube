@@ -10,7 +10,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:glassCornerRadius="26dp"
+    app:glassCornerRadius="16dp"
     app:glassOnGlass="true"
     app:glassTint="@color/meetube_greet_glass_tint">
 
