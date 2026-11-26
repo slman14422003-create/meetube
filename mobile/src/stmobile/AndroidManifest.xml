@@ -119,6 +119,14 @@
         <!-- The TV manifest makes Splash singleInstance, which puts it in a separate task and
              forces Android's non-overridable cross-task slide when it routes into mobile Home.
              Keep the launcher and Home in the same normal phone task. -->
+        <!-- MEETUBE(crash): the crash report screen, in its own process so it survives the app's crash. -->
+        <activity
+            android:name="com.newtube.mobile.crash.CrashActivity"
+            android:exported="false"
+            android:process=":crash"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Material.NoActionBar" />
+
         <!-- NEWTUBE(theme): uiMode too - the first launch after the Theme setting's migration applies
              the app's night mode (ThemeMode, setApplicationNightMode on Android 12+) while this
              routing screen may still be starting; it draws nothing, so it must not be relaunched. -->

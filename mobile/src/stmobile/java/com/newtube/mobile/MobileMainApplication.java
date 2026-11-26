@@ -144,7 +144,7 @@ public class MobileMainApplication extends MainApplication {
                 // Unknown: treat it as the main process.
             }
         }
-        return name != null && name.endsWith(":phoenix");
+        return name != null && (name.endsWith(":phoenix") || name.endsWith(":crash"));
     }
 
     @Override
@@ -156,6 +156,7 @@ public class MobileMainApplication extends MainApplication {
         if (isPhoenixProcess()) {
             return;
         }
+        com.newtube.mobile.crash.CrashHandler.install(this); // MEETUBE(crash): a report screen instead of closing
         // MEETUNE(play mode): songs play by MeeTune's own mode; MeeTube's Autoplay is for videos.
         com.liskovsoft.smartyoutubetv2.common.app.models.playback.QueuePlaybackMode.setOwnMode(video ->
                 com.newtube.mobile.ui.meetune.MeeTune.isMusic(video)
@@ -227,6 +228,7 @@ public class MobileMainApplication extends MainApplication {
         // Keep ALL existing TV init: Conscrypt, GlobalPreferences, multidex, the
         // global exception handler and every other View->Activity mapping.
         super.onCreate();
+        com.newtube.mobile.crash.CrashHandler.install(this); // the TV init may have set its own handler
         com.newtube.mobile.player.Media3PlayerController.applyHdrSetting(this); // MEETUBE(issue #35)
         // MEETUBE(glass): which screen a sheet in its own activity frosts.
         com.newtube.mobile.ui.common.SheetGlass.track(this, com.newtube.mobile.ui.dialog.MobileAppDialogActivity.class);
