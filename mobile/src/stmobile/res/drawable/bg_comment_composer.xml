@@ -7,16 +7,16 @@
         <shape android:shape="rectangle">
             <solid android:color="@color/mobile_color_divider" />
             <corners
-                android:topLeftRadius="24dp"
-                android:topRightRadius="24dp" />
+                android:topLeftRadius="18dp"
+                android:topRightRadius="18dp" />
         </shape>
     </item>
     <item android:top="1dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/mobile_color_surface" />
             <corners
-                android:topLeftRadius="24dp"
-                android:topRightRadius="24dp" />
+                android:topLeftRadius="18dp"
+                android:topRightRadius="18dp" />
         </shape>
     </item>
 </layer-list>

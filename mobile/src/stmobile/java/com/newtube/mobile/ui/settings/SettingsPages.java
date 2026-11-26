@@ -27,9 +27,11 @@ import java.util.List;
  * <pre>
  * Settings
  *   [ Search settings ]          (SettingsSearchFragment: every row of every page)
- *   App:    General · Customization · Feeds · History and privacy · Downloads · Notifications
- *   Video:  Playback · Video quality · Audio quality · Captions · SponsorBlock · DeArrow
- *   Other:  Backup and restore · Advanced · About
+ *   App:      General · Customization · Notifications
+ *   Video:    Playback · Video quality · Audio quality · Captions · SponsorBlock · DeArrow
+ *   Content:  Feeds · History and privacy · Downloads
+ *   Device:   Storage · Battery · Backup and restore
+ *   Other:    Advanced · About
  * </pre>
  */
 public final class SettingsPages {
@@ -155,12 +157,6 @@ public final class SettingsPages {
         rows.add(SettingsRow.page(R.drawable.ic_settings_customize, context.getString(R.string.mobile_settings_customize),
                 context.getString(R.string.mobile_settings_customize_summary), CUSTOMIZE)
                 .summary(() -> customizeSummary(context)));
-        rows.add(SettingsRow.page(R.drawable.ic_settings_feeds, context.getString(R.string.mobile_settings_feeds),
-                context.getString(R.string.mobile_settings_feeds_summary), FEEDS));
-        rows.add(SettingsRow.page(R.drawable.ic_settings_privacy, context.getString(R.string.mobile_settings_privacy),
-                context.getString(R.string.mobile_settings_privacy_summary), PRIVACY));
-        rows.add(SettingsRow.page(R.drawable.ic_nav_downloads_outline, context.getString(R.string.header_downloads),
-                context.getString(R.string.mobile_settings_downloads_summary), DOWNLOADS));
         rows.add(SettingsRow.page(R.drawable.ic_about_notifications, context.getString(R.string.mobile_settings_notifications),
                 null, NOTIFICATIONS).summary(() -> NotificationPages.summary(context)));
 
@@ -178,15 +174,25 @@ public final class SettingsPages {
         rows.add(SettingsRow.page(R.drawable.ic_settings_dearrow, context.getString(R.string.dearrow_provider),
                 null, DEARROW).summary(() -> PlayerPages.deArrowSummary(context)));
 
-        rows.add(SettingsRow.header(context.getString(R.string.mobile_settings_group_other)));
-        rows.add(SettingsRow.page(R.drawable.ic_settings_backup, context.getString(R.string.mobile_settings_backup),
-                context.getString(R.string.mobile_settings_backup_summary), BACKUP));
+        rows.add(SettingsRow.header(context.getString(R.string.mobile_settings_group_content)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_feeds, context.getString(R.string.mobile_settings_feeds),
+                context.getString(R.string.mobile_settings_feeds_summary), FEEDS));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_privacy, context.getString(R.string.mobile_settings_privacy),
+                context.getString(R.string.mobile_settings_privacy_summary), PRIVACY));
+        rows.add(SettingsRow.page(R.drawable.ic_nav_downloads_outline, context.getString(R.string.header_downloads),
+                context.getString(R.string.mobile_settings_downloads_summary), DOWNLOADS));
+
+        rows.add(SettingsRow.header(context.getString(R.string.mobile_settings_group_device)));
         rows.add(SettingsRow.page(R.drawable.ic_settings_storage, context.getString(R.string.mobile_settings_storage),
                 context.getString(R.string.mobile_settings_storage_summary), STORAGE));
         rows.add(SettingsRow.page(R.drawable.ic_settings_battery, context.getString(R.string.mobile_settings_battery),
                 null, BATTERY).summary(() -> context.getString(BatterySaver.isManual(context)
                 ? R.string.mobile_settings_battery_manual_on : BatterySaver.mode(context) == BatterySaver.LIGHT
                 ? R.string.mobile_settings_battery_light : R.string.mobile_settings_battery_keep)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_backup, context.getString(R.string.mobile_settings_backup),
+                context.getString(R.string.mobile_settings_backup_summary), BACKUP));
+
+        rows.add(SettingsRow.header(context.getString(R.string.mobile_settings_group_other)));
         rows.add(SettingsRow.page(R.drawable.ic_settings_advanced, context.getString(R.string.mobile_settings_advanced),
                 context.getString(R.string.mobile_settings_advanced_summary), ADVANCED));
         rows.add(SettingsRow.page(R.drawable.ic_settings_about, context.getString(R.string.mobile_settings_about),

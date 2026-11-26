@@ -420,7 +420,7 @@ final class BarEditor extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         pill.setGravity(Gravity.CENTER);
         pill.setPadding(dp(context, 6), 0, dp(context, 6), 0);
         GradientDrawable background = new GradientDrawable();
-        background.setCornerRadius(dp(context, 24));
+        background.setCornerRadius(dp(context, 16));
         background.setColor(ContextCompat.getColor(context, R.color.mobile_color_card));
         background.setStroke(dp(context, 1), ContextCompat.getColor(context, R.color.mobile_color_divider));
         pill.setBackground(background);

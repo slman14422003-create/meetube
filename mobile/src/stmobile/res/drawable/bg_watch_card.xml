@@ -5,14 +5,14 @@
         <shape android:shape="rectangle">
             <solid android:color="@color/meetube_watch_card"/>
             <stroke android:width="0.5dp" android:color="@color/meetube_glass_stroke"/>
-            <corners android:radius="22dp"/>
+            <corners android:radius="16dp"/>
         </shape>
     </item>
     <item>
         <selector android:enterFadeDuration="90" android:exitFadeDuration="380">
             <item android:state_pressed="true">
                 <shape android:shape="rectangle">
-                    <corners android:radius="22dp"/>
+                    <corners android:radius="16dp"/>
                     <gradient android:angle="270" android:startColor="@color/glass_press_top" android:endColor="@color/glass_press_bottom"/>
                     <stroke android:width="0.5dp" android:color="@color/glass_press_rim"/>
                 </shape>

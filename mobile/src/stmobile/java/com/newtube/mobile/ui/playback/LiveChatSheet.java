@@ -473,7 +473,7 @@ public class LiveChatSheet extends BottomSheetDialogFragment {
     }
 
     private static final float CARD_MARGIN_DP = 12f;
-    private static final float CARD_CORNER_DP = 24f;
+    private static final float CARD_CORNER_DP = 16f;
 
     /**
      * MEETUBE(live chat, issue #32): a landscape side panel as a card, every corner rounded (the
