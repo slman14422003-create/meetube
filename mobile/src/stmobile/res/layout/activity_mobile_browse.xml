@@ -648,7 +648,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="bottom|left"
-                android:layout_marginLeft="6dp"
+                android:layout_marginStart="6dp"
                 android:layout_marginBottom="6dp"
                 android:contentDescription="@string/mobile_player_audio_only"
                 android:padding="9dp"
@@ -858,7 +858,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:ellipsize="end"
                 android:maxLines="1"
+                android:textAlignment="viewStart"
                 android:text="@string/meetune_home_hint"
                 android:textColor="@color/mobile_color_on_surface"
                 android:textSize="15sp" />

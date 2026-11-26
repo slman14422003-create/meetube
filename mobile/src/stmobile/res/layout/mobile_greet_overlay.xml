@@ -27,32 +27,7 @@
             android:gravity="center_vertical"
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/greet_side_padding"
-            android:paddingVertical="24dp">
-
-            <TextView
-                android:id="@+id/mobile_greet_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autoSizeMaxTextSize="44sp"
-                android:autoSizeMinTextSize="26sp"
-                android:autoSizeTextType="uniform"
-                android:fontFamily="cursive"
-                android:gravity="center"
-                android:maxLines="1"
-                android:textColor="@color/mobile_color_on_surface"
-                android:textStyle="bold"
-                tools:text="Good evening" />
-
-            <TextView
-                android:id="@+id/mobile_greet_line"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="20dp"
-                android:gravity="center"
-                android:textColor="@color/mobile_color_on_surface_secondary"
-                android:textSize="15sp"
-                tools:text="Wind down with something good" />
+            android:paddingVertical="32dp">
 
         </LinearLayout>
 

@@ -34,6 +34,8 @@
 
         <TextView
             android:id="@+id/settings_row_title"
+            android:textAlignment="viewStart"
+            android:textDirection="locale"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/mobile_color_on_surface"
@@ -42,6 +44,8 @@
 
         <TextView
             android:id="@+id/settings_row_summary"
+            android:textAlignment="viewStart"
+            android:textDirection="locale"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
