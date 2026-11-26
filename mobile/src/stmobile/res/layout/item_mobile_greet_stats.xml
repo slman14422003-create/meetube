@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.newtube.mobile.ui.common.GlassView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    app:glassCornerRadius="24dp"
+    app:glassOnGlass="true"
+    app:glassTint="@color/meetube_greet_glass_tint">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <TextView
+            android:id="@+id/stats_hero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="@dimen/greet_hero_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/stats_hero_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:id="@+id/stats_numbers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal" />
+
+        <TextView
+            android:id="@+id/stats_week_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/stats_bars"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/greet_bars_height"
+            android:layout_marginTop="8dp"
+            android:gravity="bottom"
+            android:orientation="horizontal" />
+
+        <LinearLayout
+            android:id="@+id/stats_days"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal" />
+
+        <TextView
+            android:id="@+id/stats_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:alpha="0.7"
+            android:gravity="center"
+            android:text="@string/mobile_stats_on_device"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+</com.newtube.mobile.ui.common.GlassView>

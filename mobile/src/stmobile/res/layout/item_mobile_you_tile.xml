@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MEETUBE(you page): an Explore tile on the You tab, four to a line: a frosted glass square on the card, the icon
+     over its name. Wired in MobileBrowseActivity.youSectionRow(). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mobile_you_row_glass"
+    android:layout_width="0dp"
+    android:layout_height="88dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:background="@drawable/mobile_you_tile_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="4dp">
+
+        <ImageView
+            android:id="@+id/mobile_you_row_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            android:tint="@color/mobile_color_on_surface" />
+
+        <TextView
+            android:id="@+id/mobile_you_row_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:fontFamily="?attr/appFontRegular"
+            android:maxLines="1"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
+</FrameLayout>
