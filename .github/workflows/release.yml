@@ -6,7 +6,7 @@
 #   "3.7.0 Nova"; the code is worked out from the number unless you give one). It builds with that
 #   version and keeps the APKs as artifacts; tick "publish" to also create the GitHub release
 #   vX.Y.Z (no meetube.json, so the in-app updater is untouched).
-# Secrets: SIGNING_KEY (the .jks, base64), KEY_STORE_PASSWORD, ALIAS, KEY_PASSWORD. Every release
+# Secrets (optional on a fork - without them the APKs are debug-signed): SIGNING_KEY (the .jks, base64), KEY_STORE_PASSWORD, ALIAS, KEY_PASSWORD. Every release
 # must use the same key or installed apps refuse the update.
 name: Release
 
@@ -80,7 +80,12 @@ jobs:
           ALIAS: ${{ secrets.ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          if [ -z "$SIGNING_KEY" ]; then echo "::error::SIGNING_KEY secret is missing"; exit 1; fi
+          if [ -z "$SIGNING_KEY" ]; then
+            # No secrets (a fork): the build falls back to the debug key. Fine for testing, but each
+            # run signs with a different key, so installing over an older build needs an uninstall first.
+            echo "::warning::SIGNING_KEY secret is missing - building with the debug key"
+            exit 0
+          fi
           echo "$SIGNING_KEY" | base64 --decode > "$RUNNER_TEMP/release.jks"
           {
             echo "storeFile=$RUNNER_TEMP/release.jks"
