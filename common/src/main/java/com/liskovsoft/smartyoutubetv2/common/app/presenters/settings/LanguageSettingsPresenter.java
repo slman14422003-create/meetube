@@ -70,11 +70,11 @@ public class LanguageSettingsPresenter extends BasePresenter<Void> {
 
         for (Entry<String, String> entry : languages.entrySet()) {
             if (entry.getValue().equals(language)) {
-                languageTitle = String.format(" (%s)", entry.getKey());
+                languageTitle = String.format(" (%s)", languageName(entry));
             }
 
             options.add(UiOptionItem.from(
-                    entry.getKey(),
+                    languageName(entry),
                     option -> {
                         mLangUpdater.setPreferredLanguage(entry.getValue());
                         mRestartApp = true;
@@ -97,11 +97,11 @@ public class LanguageSettingsPresenter extends BasePresenter<Void> {
 
         for (Entry<String, String> entry : countries.entrySet()) {
             if (entry.getValue().equals(country)) {
-                countryTitle = String.format(" (%s)", entry.getKey());
+                countryTitle = String.format(" (%s)", countryName(entry));
             }
 
             options.add(UiOptionItem.from(
-                    entry.getKey(),
+                    countryName(entry),
                     option -> {
                         mLangUpdater.setPreferredCountry(entry.getValue());
                         mRestartApp = true;
@@ -130,5 +130,29 @@ public class LanguageSettingsPresenter extends BasePresenter<Void> {
         String country = LocaleUtility.getCurrentLocale(getContext()).getDisplayCountry();
         map.put(getContext().getResources().getString(R.string.default_lang) + " - " + country, "");
         return Helpers.getMap(Helpers.sortNatural(getContext().getResources().getStringArray(R.array.supported_countries)), "|", map);
+    }
+
+    /** A language's own name (Arabic shows as "العربية"), so the list reads right in any app language. */
+    private String languageName(Entry<String, String> entry) {
+        String code = entry.getValue();
+        if (code == null || code.isEmpty()) {
+            return entry.getKey(); // "Default - <language>", already in the app language
+        }
+        java.util.Locale locale = java.util.Locale.forLanguageTag(code.replace('_', '-'));
+        String name = locale.getDisplayName(locale);
+        if (name == null || name.isEmpty() || name.equalsIgnoreCase(code)) {
+            return entry.getKey();
+        }
+        return name.substring(0, 1).toUpperCase(locale) + name.substring(1);
+    }
+
+    /** A country's name in the app's language (the English list names are only a fallback). */
+    private String countryName(Entry<String, String> entry) {
+        String code = entry.getValue();
+        if (code == null || code.isEmpty()) {
+            return entry.getKey();
+        }
+        String name = new java.util.Locale("", code).getDisplayCountry(LocaleUtility.getCurrentLocale(getContext()));
+        return name == null || name.isEmpty() || name.equalsIgnoreCase(code) ? entry.getKey() : name;
     }
 }

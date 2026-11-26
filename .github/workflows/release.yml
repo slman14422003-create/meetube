@@ -24,10 +24,10 @@ on:
         required: false
         type: string
       publish:
-        description: 'Also publish a GitHub release with this version'
+        description: 'Publish a GitHub release with the APKs and meetube.json (what the in-app updater reads)'
         required: false
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: write
@@ -148,6 +148,8 @@ jobs:
         run: |
           if [ "$MANUAL" = "true" ]; then
             TAG="v${NAME%% *}"
+            # The hand-started build also writes meetube.json, or the app would find no update.
+            python3 tools/update_manifest.py --manual --tag "$TAG" --dist dist --out dist/meetube.json
           else
             TAG="$REF_TAG"
             # Fails unless the tag, build.gradle and CHANGELOG.md agree on the version.
@@ -160,10 +162,6 @@ jobs:
             echo "Manual build of $NAME." > changes.md
           fi
           url="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/MeeTube_${TAG#v}"
-          # MeeTube TV ships from yashoncode/meetube-tv under tv-vX.Y.Z tags: the newest non-beta one's universal APK.
-          tv_repo=yashoncode/meetube-tv
-          tv=$(gh release list --repo "$tv_repo" --exclude-pre-releases --limit 100 --json tagName \
-            --jq '[.[].tagName | select(startswith("tv-v"))][0] // empty')
           {
             echo "### Download"
             echo
@@ -172,10 +170,13 @@ jobs:
             echo "| **Most phones** | [arm64-v8a](${url}_arm64-v8a.apk) |"
             echo "| **Low end phones** (older or 32-bit) | [armeabi-v7a](${url}_armeabi-v7a.apk) |"
             echo "| **Universal** (not sure? this one works on all) | [universal](${url}_universal.apk) |"
-            if [ -n "$tv" ]; then
-              echo "| **TV** (Android TV, Google TV, Fire TV) | [universal](https://github.com/$tv_repo/releases/download/$tv/MeeTubeTV_${tv#tv-v}_universal.apk) |"
-            fi
             echo
             cat changes.md
           } > notes.md
-          gh release create "$TAG" dist/* --title "MeeTube $NAME" --notes-file notes.md --target "$GITHUB_SHA"
+          # Running the same version again replaces its release instead of failing.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release delete "$TAG" --yes --cleanup-tag
+          fi
+          # The update: the APKs and meetube.json go up as the latest release, which the app reads at
+          # releases/latest/download/meetube.json.
+          gh release create "$TAG" dist/* --title "MeeTube $NAME" --notes-file notes.md --target "$GITHUB_SHA" --latest
