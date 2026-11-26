@@ -4,6 +4,7 @@
   <string name="title_search">بحث</string>
   <string name="header_subscriptions">الاشتراكات</string>
   <string name="header_history">السجلّ</string>
+    <string name="header_downloads">التنزيلات</string>
   <string name="header_music">موسيقى</string>
   <string name="header_news">أخبار</string>
   <string name="header_gaming">ألعاب فيديو</string>
@@ -39,7 +40,9 @@
   <string name="install_update">تثبيت التحديث</string>
   <string name="section_is_empty">عفوًا! لا يوجد شيء هنا</string>
   <string name="dialog_add_to_playlist">إضافة/إزالة من قائمة التشغيل</string>
+    <string name="dialog_download">تنزيل</string>
   <string name="msg_signed_users_only">المستخدمون المسجلون فقط</string>
+    <string name="msg_sign_in_to_save">سجّل الدخول لحفظ الفيديوهات في قوائم التشغيل</string>
   <string name="msg_cant_load_content">لا يمكن تحميل المحتوى.\n1) قم بتشغيل السجلّ.\n2) تحقق من التاريخ والوقت على الجهاز.\n3) تحقق من اتصال الشبكة.\n4) تحقق من إعدادات الوكيل لديك.\n5) حاول تسجيل الدخول إلى حسابك.\n6) ربما لا يوجد شيء هنا.</string>
   <string name="title_video_presets">إعدادات الفيديو المسبقة</string>
   <string name="settings_accounts">الحسابات</string>
@@ -50,10 +53,18 @@
   <string name="settings_language">اللغة</string>
   <string name="settings_linked_devices">الأجهزة المرتبطة</string>
   <string name="settings_about">حول التطبيق</string>
+    <string name="about_app">حول %1$s</string>
+    <string name="about_source_code">الشيفرة المصدرية</string>
+    <string name="about_license">الترخيص</string>
+    <string name="diagnostic_log_send">إرسال سجل التشخيص</string>
+    <string name="diagnostic_log_send_desc">للإبلاغ عن الأخطاء. يتضمن الفيديوهات والقنوات التي فتحتها، وتتم إزالة كلمات المرور ورموز تسجيل الدخول</string>
+    <string name="diagnostic_log_subject">سجل تشخيص %1$s %2$s</string>
+    <string name="diagnostic_log_failed">تعذّر إنشاء سجل التشخيص</string>
   <string name="dialog_account_list">تحديد حساب</string>
   <string name="dialog_account_none">بدون</string>
   <string name="dialog_remove_account">تسجيل الخروج</string>
   <string name="dialog_add_account">تسجيل الدخول</string>
+    <string name="signed_in_success">تم تسجيل الدخول</string>
   <string name="default_lang">الافتراضي</string>
   <string name="dialog_select_language">اللغة</string>
   <string name="header_channels">القنوات</string>
@@ -112,6 +123,11 @@
   <string name="repeat_mode_none">إنهاء التشغيل بعد فيديو واحد (باستثناء قائمة الانتظار)</string>
   <string name="subscribed_to_channel">مشترك في القناة</string>
   <string name="unsubscribed_from_channel">غير مشترك في القناة</string>
+    <string name="subscribed_to_channel_name">تم الاشتراك في %1$s</string>
+    <string name="unsubscribed_from_channel_name">تم إلغاء الاشتراك من %1$s</string>
+    <string name="subscribe_failed">تعذّر الاشتراك. حاول مرة أخرى.</string>
+    <string name="unsubscribe_failed">تعذّر إلغاء الاشتراك. حاول مرة أخرى.</string>
+    <string name="action_undo">تراجع</string>
   <string name="subtitle_yellow_transparent">صفراء على خلفية شفافة</string>
   <string name="subtitle_white_black">بيضاء على خلفية سوداء</string>
   <string name="player_seek_preview">معاينة أثناء التنقل في الفيديو</string>
@@ -190,6 +206,9 @@
   <string name="remote_session_closed">تم إغلاق الجلسة عن بُعد</string>
   <string name="msg_mode_switch_error">لا يمكن تبديل وضع العرض إلى \"%s\"</string>
   <string name="msg_player_error">حدث خطأ في المشغل %s. جارٍ إعادة التشغيل...</string>
+    <string name="msg_player_no_connection_retry">لا يوجد اتصال. ستتم إعادة المحاولة عند عودة الاتصال، أو اضغط على تشغيل لإعادة المحاولة.</string>
+    <string name="msg_player_no_connection_short">لا يوجد اتصال — جارٍ إعادة المحاولة…</string>
+    <string name="msg_player_no_connection_tap">لا يوجد اتصال — اضغط على تشغيل لإعادة المحاولة</string>
   <string name="video_preset_disabled">بدون إعداد مسبق</string>
   <string name="video_preset_enabled">سيتم ضبط تنسيق الفيديو التالي وفقًا للإعداد المسبق</string>
   <string name="player_sleep_timer">مؤقت النوم</string>
@@ -214,6 +233,7 @@
   <string name="pin_unpin_from_sidebar">إضافة/إزالة من الشريط الجانبي</string>
   <string name="pinned_to_sidebar">مضاف إلى الشريط الجانبي</string>
   <string name="unpin_from_sidebar">إزالة من الشريط الجانبي</string>
+    <string name="unpin_playlist">إزالة قائمة التشغيل من الشريط الجانبي</string>
   <string name="unpinned_from_sidebar">تمت الإزالة من الشريط الجانبي</string>
   <string name="dialog_select_country">الدولة</string>
   <string name="settings_language_country">اللغة/الدولة</string>
@@ -314,6 +334,7 @@
   <string name="hide_shorts_from_home">إخفاء فيديوهات Shorts من القائمة الرئيسية</string>
   <string name="finish_on_disconnect">أغلق التطبيق بعد فصل الجوّال/الجهاز اللوحي</string>
   <string name="update_error">خطأ في التحديث</string>
+    <string name="update_check_failed">تعذّر التحقق من التحديثات. حاول لاحقًا.</string>
   <string name="hide_shorts_from_history">إخفاء فيديوهات Shorts من السجلّ</string>
   <string name="disable_screensaver">تعطيل شاشة التوقف</string>
   <string name="player_ok_button_behavior">وظيفة زر OK</string>
@@ -389,6 +410,7 @@
   <string name="saved_to_playlists">تمت الإضافة إلى قسم قوائم التشغيل</string>
   <string name="create_playlist">إنشاء قائمة التشغيل</string>
   <string name="create_playlist_note">لن تظهر في تطبيق YouTube</string>
+    <string name="playlist_name_hint">اسم قائمة التشغيل</string>
   <string name="add_video_to_new_playlist">إضافة إلى قائمة تشغيل جديدة</string>
   <string name="cant_delete_empty_playlist">لا يمكن حذف قائمة التشغيل الفارغة</string>
   <string name="playlist">قائمة التشغيل</string>
@@ -529,6 +551,7 @@
   <string name="enable_voice_search_desc">سيتم استبدال التطبيق الرسمي بما يسمى \"bridge\". يساعد الجسر في نقل طلبات البحث العامة إلى تطبيقنا.</string>
   <string name="not_recommend_channel">عدم اقتراح القناة</string>
   <string name="you_wont_see_this_channel">لن ترى هذه القناة في الاقتراحات</string>
+    <string name="feedback_failed">تعذّر إرسال ذلك إلى YouTube. حاول مرة أخرى.</string>
   <string name="enable_master_password">تمكين كلمة المرور الرئيسية</string>
   <string name="enter_master_password">أدخل كلمة المرور الرئيسية</string>
   <string name="disable_stream_buffer">تعطيل التخزين المؤقت في البث المباشر</string>
@@ -549,6 +572,7 @@
   <string name="old_update_notifications">المظهر القديم لإشعارات التحديث</string>
   <string name="mark_as_watched">وضع علامة كمشاهد</string>
   <string name="player_likes_count">عرض عدد الإعجابات/عدم الإعجاب</string>
+    <string name="player_return_youtube_dislike">عدد مرات عدم الإعجاب (Return YouTube Dislike)</string>
   <string name="sorting_alphabetically2">أبجديًا (معاينات سريعة ومتحركة)</string>
   <string name="sorting_default">افتراضيًا (معاينات سريعة ومتحركة)</string>
   <string name="player_ui_animations">تمكين تأثيرات الحركة في واجهة المشغل</string>
@@ -565,6 +589,8 @@
   <string name="msg_player_error_video_source">عنوان URL للفيديو لا يعمل أو وقت الجهاز غير صحيح.\nعادةً ما يكون ذلك خطأً في التطبيق.</string>
   <string name="msg_player_error_audio_source">عنوان URL للصوت لا يعمل أو وقت الجهاز غير صحيح.\nعادةً ما يكون ذلك خطأً في التطبيق.</string>
   <string name="msg_player_error_subtitle_source">عنوان URL للترجمة لا يعمل أو وقت الجهاز غير صحيح.\nعادةً ما يكون ذلك خطأً في التطبيق.</string>
+    <string name="msg_quality_pin_fallback">تعذّر تشغيل %1$s — تم ضبط الجودة على تلقائي لهذا الفيديو</string>
+    <string name="msg_audio_pin_fallback">تعذّر تشغيل المسار الصوتي — يتم استخدام الصوت الافتراضي لهذا الفيديو</string>
   <string name="player_volume">مستوى الصوت</string>
   <string name="open_comments">فتح التعليقات</string>
   <string name="disable_history">تعطيل السجلّ</string>
@@ -636,6 +662,7 @@
   <string name="disable_remote_history">تعطيل السجلّ عند استخدام التحكم بالهاتف</string>
   <string name="keyboard_fix">منع زر OK من فتح لوحة المفاتيح (G20s وغيرها)</string>
   <string name="nothing_found">لم يتم العثور على شيء</string>
+    <string name="channel_sort_failed">تعذّر ترتيب هذه القناة. حاول مرة أخرى.</string>
   <string name="auto_frame_rate_desc">يُزيل هذا الخيار الاهتزاز في المشاهد التي تتحرك فيها الكاميرا بسرعة، على سبيل المثال البث الرياضي</string>
   <string name="channel_filter_hint">فلترة القنوات</string>
   <string name="player_loop_shorts">تكرار Shorts</string>
@@ -644,6 +671,7 @@
   <string name="channels_filter">عرض حقل فلترة القنوات في قسم القنوات</string>
   <string name="channel_search_bar">شريط البحث في صفحة القناة</string>
   <string name="header_sports">رياضة</string>
+    <string name="header_live">مباشر</string>
   <string name="keep_finished_activities">الاحتفاظ بالأنشطة المكتملة</string>
   <string name="disable_channels_service">تعطيل خدمة القنوات</string>
   <string name="replace_titles">استبدال العناوين</string>
@@ -728,6 +756,13 @@
   <string name="fix_empty_subs_and_channels">إصلاح الاشتراكات والقنوات الفارغة</string>
   <string name="local_backup_not_supported">لا يدعم نظام Android TV 11 والإصدارات الأحدث ميزة النسخ الاحتياطي التلقائي بسبب قيود النظام. استخدم Google Drive بدلًا من ذلك.</string>
   <string name="rounded_card_corners">زوايا البطاقات مدوّرة</string>
+    <string name="app_restore_desc">ملاحظة: يجب نسخ ملف النسخة الاحتياطية المضغوط إلى هذا المجلد يدويًا أو من خلال مدير الملفات باستخدام «فتح باستخدام»</string>
+    <string name="app_backup_desc">ملاحظة: سيتم إنشاء النسخة الاحتياطية بصيغة zip</string>
+    <string name="add_video_to_watch_later">الحفظ في المشاهدة لاحقًا</string>
+    <string name="enable_conscrypt">تفعيل Conscrypt</string>
+    <string name="enable_conscrypt_desc">يحسّن توافق HTTPS وTLS وVPN على بعض الأجهزة، لكنه قد يسبب أحيانًا مشكلات في التشغيل أو بطئًا في الشبكة</string>
+    <string name="network_settings">إعدادات الشبكة</string>
+    <string name="comments_disabled">التعليقات معطّلة لهذا الفيديو</string>
   <string name="install_bridge">تثبيت ATV/Amazon Bridge</string>
   <string name="player_time_stretching">تمديد زمن الصوت</string>
   <string name="player_time_stretching_desc">يحافظ على طبيعة الصوت عند تغيير السرعة. قد يقلل الأداء بشكل ملحوظ على بعض الأجهزة.</string>
@@ -737,11 +772,25 @@
   <string name="remove_from_search_history">إزالة من سجل البحث</string>
   <string name="color_scheme_dark_blue_oled">أزرق داكن (OLED)</string>
   <plurals name="hours">
-        <item quantity="one">%s ساعة</item>
+        <item quantity="zero">%s ساعة</item>
+        <item quantity="one">ساعة واحدة</item>
+        <item quantity="two">ساعتان</item>
+        <item quantity="few">%s ساعات</item>
+        <item quantity="many">%s ساعة</item>
         <item quantity="other">%s ساعة</item>
     </plurals>
     <plurals name="seconds">
-        <item quantity="one">%s ثانية</item>
+        <item quantity="zero">%s ثانية</item>
+        <item quantity="one">ثانية واحدة</item>
+        <item quantity="two">ثانيتان</item>
+        <item quantity="few">%s ثوانٍ</item>
+        <item quantity="many">%s ثانية</item>
         <item quantity="other">%s ثانية</item>
     </plurals>
+    <string name="bridge_cannot_uninstall">لا يمكن إلغاء تثبيت الحزمة %1$s!</string>
+    <string name="video_action_missing_data">عنصر الفيديو لا يحتوي على البيانات المطلوبة!</string>
+    <string name="backup_restore_failed">تعذّرت استعادة النسخة الاحتياطية: %1$s</string>
+    <string name="backup_no_zip_received">لم يتم استلام ملف ZIP</string>
+    <string name="backup_folder_empty">عذرًا، مجلد النسخة الاحتياطية فارغ.</string>
+    <string name="unknown_channel_type">نوع قناة غير معروف</string>
 </resources>

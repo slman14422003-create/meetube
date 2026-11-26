@@ -800,4 +800,10 @@
         <item quantity="one">%s second</item>
         <item quantity="other">%s seconds</item>
     </plurals>
+    <string name="bridge_cannot_uninstall">The package %1$s cannot be uninstalled!</string>
+    <string name="video_action_missing_data">Video item doesn\'t contain needed data!</string>
+    <string name="backup_restore_failed">Failed to restore backup: %1$s</string>
+    <string name="backup_no_zip_received">No ZIP received</string>
+    <string name="backup_folder_empty">Oops. Backup folder is empty.</string>
+    <string name="unknown_channel_type">Unknown type of channel</string>
 </resources>
