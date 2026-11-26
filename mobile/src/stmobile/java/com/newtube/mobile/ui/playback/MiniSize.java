@@ -1,0 +1,310 @@
+package com.newtube.mobile.ui.playback;
+
+import com.newtube.mobile.ui.common.PrefCache;
+import android.app.Activity;
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import androidx.media3.ui.AspectRatioFrameLayout;
+
+import com.google.android.material.card.MaterialCardView;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.Video;
+import com.liskovsoft.smartyoutubetv2.tv.R;
+import com.newtube.mobile.ui.common.GlassView;
+import com.newtube.mobile.ui.common.GlassSource;
+
+/**
+ * MEETUBE(issue #188): the floating mini player's type and size (Settings > Customization), and
+ * its compact corner buttons, small and set in from the corners so a tap on the picture to expand
+ * does not land on Close or Audio.
+ *
+ * <p>Default is the 16:9 card (pinch to resize it). Minimal is a bar that is the video itself,
+ * cropped to fill it, with the title and channel, pause and close over it (issue #226). Minimal 2
+ * is a frosted pill with the whole video in a 16:9 window, then the title. Disabled has no card:
+ * minimizing closes.
+ */
+public final class MiniSize {
+    public static final int DEFAULT = 0;
+    public static final int MINIMAL = 1; // the bar is the video (issue #226), title and buttons over it
+    public static final int MINIMAL2 = 2; // frosted glass pill, the picture then the title
+    public static final int DISABLED = 3;
+
+    private static final String PREFS = "mini_pip";
+    private static final String KEY = "size_percent";
+    private static final String KEY_TYPE = "type";
+    private static final int MIN_PERCENT = 60;
+    private static final int MAX_PERCENT = 500;
+
+    private MiniSize() {
+    }
+
+    public static int type(Context context) {
+        return PrefCache.getInt(context, PREFS, KEY_TYPE, DEFAULT);
+    }
+
+    public static void setType(Context context, int type) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putInt(KEY_TYPE, type).apply();
+    }
+
+    static boolean isBar(Context context) {
+        int type = type(context);
+        return type == MINIMAL || type == MINIMAL2;
+    }
+
+    public static int percent(Context context) {
+        return PrefCache.getInt(context, PREFS, KEY, 100);
+    }
+
+    public static void setPercent(Context context, int percent) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putInt(KEY, Math.max(MIN_PERCENT, Math.min(MAX_PERCENT, percent))).apply();
+    }
+
+    private static float dp(Context context) {
+        return context.getResources().getDisplayMetrics().density;
+    }
+
+    /** The picture's size: the whole card, or the bar's 16:9 window. */
+    public static int height(Context context) {
+        if (isBar(context)) {
+            return Math.round(64 * dp(context)); // a pinch sizes only the Default card
+        }
+        return Math.round(width(context) * 9f / 16f);
+    }
+
+    public static int width(Context context) {
+        if (type(context) == MINIMAL) {
+            return cardWidth(context); // MEETUBE(issue #226): the whole bar
+        }
+        if (isBar(context)) {
+            return Math.round(height(context) * 16f / 9f);
+        }
+        return Math.round(Math.min(baseWidth(context) * percent(context) / 100f,
+                context.getResources().getDisplayMetrics().widthPixels - 16 * dp(context)));
+    }
+
+    /** The card's own width: the picture for Default, a bar across the screen otherwise. */
+    public static int cardWidth(Context context) {
+        if (!isBar(context)) {
+            return width(context);
+        }
+        float dp = dp(context);
+        return Math.round(Math.min(context.getResources().getDisplayMetrics().widthPixels - 24 * dp, 520 * dp));
+    }
+
+    /** Where the picture starts inside the card: always its left edge. */
+    public static int pictureOffset(Context context) {
+        return 0;
+    }
+
+    private static float baseWidth(Context context) {
+        return context.getResources().getDimension(R.dimen.meetube_mini_width);
+    }
+
+    /** MEETUBE(issue #233): the Default card can grow almost edge to edge in its actual parent. */
+    static float maxWidth(View card) {
+        Context context = card.getContext();
+        View parent = (View) card.getParent();
+        int width = parent != null && parent.getWidth() > 0 ? parent.getWidth()
+                : context.getResources().getDisplayMetrics().widthPixels;
+        return Math.min(baseWidth(context) * MAX_PERCENT / 100f, width - 16 * dp(context));
+    }
+
+    static float minWidth(View card) {
+        return Math.min(baseWidth(card.getContext()) * MIN_PERCENT / 100f, maxWidth(card));
+    }
+
+    /** MEETUBE(issue #233): persist and relayout once, after the transform-only pinch ends. */
+    static void commitWidth(View card, float width) {
+        setPercent(card.getContext(), Math.round(width * 100f / baseWidth(card.getContext())));
+        ViewGroup.LayoutParams params = card.getLayoutParams();
+        params.width = Math.round(width);
+        params.height = Math.round(width * 9f / 16f);
+        card.setLayoutParams(params);
+    }
+
+    /** The card's gap from the screen's end edge; the minimize morph lands on it too (issue #273). */
+    static int endMargin(Context context) {
+        return Math.round((isBar(context) ? 12 : 8) * dp(context));
+    }
+
+    /** Sizes and styles the card and its buttons; call where the card's buttons are styled. */
+    public static void apply(Activity activity) {
+        float dp = dp(activity);
+        boolean bar = isBar(activity);
+        MaterialCardView card = activity.findViewById(R.id.mobile_mini_player);
+        if (card != null) {
+            ViewGroup.LayoutParams params = card.getLayoutParams();
+            params.width = bar ? cardWidth(activity) : Math.round(Math.min(width(activity), maxWidth(card)));
+            params.height = bar ? height(activity) : Math.round(params.width * 9f / 16f);
+            ((ViewGroup.MarginLayoutParams) params).setMarginEnd(endMargin(activity));
+            card.setLayoutParams(params);
+            boolean frosted = type(activity) == MINIMAL2;
+            card.setCardBackgroundColor(frosted ? Color.TRANSPARENT : Color.BLACK);
+            card.setCardElevation(frosted ? 0 : 8 * dp); // a shadow shows through a see-through card
+            card.setRadius(frosted ? height(activity) / 2f : 18 * dp);
+            card.setStrokeWidth(bar ? Math.round(dp) : 0);
+            card.setPreventCornerOverlap(bar); // MEETUBE(issue #233): the picture reaches the rounded edge
+            frost((ViewGroup) card.getChildAt(0), frosted, activity);
+            scrim((ViewGroup) card.getChildAt(0), type(activity) == MINIMAL);
+        }
+        View frame = activity.findViewById(R.id.mobile_mini_player_frame);
+        if (frame != null) {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) frame.getLayoutParams();
+            params.width = bar ? width(activity) : ViewGroup.LayoutParams.MATCH_PARENT;
+            params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            params.gravity = bar && type(activity) != MINIMAL ? Gravity.START | Gravity.CENTER_VERTICAL : Gravity.CENTER;
+            params.setMarginStart(bar ? pictureOffset(activity) : 0);
+            frame.setLayoutParams(params);
+            if (frame instanceof AspectRatioFrameLayout) {
+                // MEETUBE(issue #226): Minimal's video fills the bar, cropped; elsewhere it is
+                // whole, letterboxed in its window (issue #9, #225).
+                ((AspectRatioFrameLayout) frame).setResizeMode(type(activity) == MINIMAL
+                        ? AspectRatioFrameLayout.RESIZE_MODE_ZOOM : AspectRatioFrameLayout.RESIZE_MODE_FIT);
+            }
+        }
+        int box = Math.round(36 * dp);
+        int pad = Math.round(9 * dp);
+        int margin = Math.round(6 * dp);
+        View close = activity.findViewById(R.id.mobile_mini_close);
+        View audio = activity.findViewById(R.id.mobile_mini_audio);
+        View pause = activity.findViewById(R.id.mobile_mini_play_pause);
+        if (close != null) {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) close.getLayoutParams();
+            params.width = box;
+            params.height = box;
+            params.gravity = bar ? Gravity.END | Gravity.CENTER_VERTICAL : Gravity.TOP | Gravity.END;
+            params.setMargins(margin, margin, margin, margin);
+            close.setLayoutParams(params);
+            close.setPadding(pad, pad, pad, pad);
+        }
+        if (audio != null) {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) audio.getLayoutParams();
+            params.width = bar ? 0 : box; // a bar has no audio button
+            params.height = bar ? 0 : box;
+            // MEETUBE(issue #233): bottom-left, YouTube's place for it; pause keeps top-left.
+            params.gravity = Gravity.BOTTOM | Gravity.LEFT;
+            params.setMargins(margin, margin, margin, margin);
+            audio.setLayoutParams(params);
+            int audioPad = bar ? 0 : pad; // padding on a 0-size button still drew its icon over the bar
+            audio.setPadding(audioPad, audioPad, audioPad, audioPad);
+            // the buttons' fades set its visibility and alpha, never its scale: 0 keeps it unseen
+            audio.setScaleX(bar ? 0f : 1f);
+            audio.setScaleY(bar ? 0f : 1f);
+        }
+        if (pause != null) {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) pause.getLayoutParams();
+            params.width = box;
+            params.height = params.width;
+            params.gravity = bar ? Gravity.END | Gravity.CENTER_VERTICAL : Gravity.TOP | Gravity.START;
+            // MEETUBE(issue #233): small corner controls; the bars keep their original placement.
+            params.setMargins(bar ? 0 : margin, bar ? 0 : margin, bar ? Math.round(48 * dp) : margin, bar ? 0 : margin);
+            pause.setLayoutParams(params);
+        }
+        ProgressBar progress = activity.findViewById(R.id.mobile_mini_progress);
+        if (progress != null) {
+            progress.setProgressTintList(ColorStateList.valueOf(bar
+                    ? androidx.core.content.ContextCompat.getColor(activity, R.color.mobile_color_progress) : Color.RED));
+        }
+        View text = activity.findViewById(R.id.mobile_mini_text);
+        if (text != null) {
+            text.setVisibility(bar ? View.VISIBLE : View.GONE);
+            if (bar) {
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) text.getLayoutParams();
+                boolean over = type(activity) == MINIMAL; // over the video, left of the buttons
+                params.gravity = Gravity.START | Gravity.CENTER_VERTICAL;
+                params.width = over ? cardWidth(activity) - Math.round(124 * dp)
+                        : cardWidth(activity) - width(activity) - Math.round(108 * dp);
+                params.setMarginStart(over ? Math.round(14 * dp) : width(activity) + Math.round(10 * dp));
+                text.setLayoutParams(params);
+                for (int id : new int[] {R.id.mobile_mini_title, R.id.mobile_mini_channel}) {
+                    TextView line = activity.findViewById(id);
+                    if (line != null) { // readable over a bright frame
+                        line.setShadowLayer(over ? 4 * dp : 0, 0, over ? dp : 0, 0xCC000000);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Minimal 2's frost: a GlassView (the nav pill's glass) under the bar's content, blurring the
+     * page (Home's or a channel's glass source; elsewhere its tint alone).
+     */
+    private static void frost(ViewGroup inner, boolean on, Activity activity) {
+        View existing = inner.findViewWithTag("mini_frost");
+        if (!on) {
+            if (existing != null) {
+                inner.removeView(existing);
+            }
+            return;
+        }
+        if (existing != null) {
+            return;
+        }
+        GlassView glass = new GlassView(activity);
+        glass.setTag("mini_frost");
+        View source = activity.findViewById(R.id.mobile_blur_target);
+        if (source == null) {
+            source = activity.findViewById(R.id.mobile_channel_glass_source);
+        }
+        glass.setSource(source instanceof GlassSource ? (GlassSource) source : null);
+        inner.addView(glass, 0, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    /**
+     * MEETUBE(issue #226): Minimal's shade over the video, dark under the title on the left and the
+     * buttons on the right, lighter between, so both read over any frame.
+     */
+    private static void scrim(ViewGroup inner, boolean on) {
+        View existing = inner.findViewWithTag("mini_scrim");
+        if (!on) {
+            if (existing != null) {
+                inner.removeView(existing);
+            }
+            return;
+        }
+        if (existing != null) {
+            return;
+        }
+        View shade = new View(inner.getContext());
+        shade.setTag("mini_scrim");
+        shade.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                new int[] {0xD9000000, 0x8C000000, 0x33000000, 0xA6000000}));
+        shade.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        // Right over the video (index 0 is the frame, or the frost under it).
+        int at = inner.indexOfChild(inner.findViewById(R.id.mobile_mini_player_frame)) + 1;
+        inner.addView(shade, at, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    /** The playing video's title and channel into the bar (a no-op for the card). */
+    public static void bindText(Activity activity) {
+        if (!isBar(activity)) {
+            return;
+        }
+        TextView title = activity.findViewById(R.id.mobile_mini_title);
+        TextView channel = activity.findViewById(R.id.mobile_mini_channel);
+        Video video = MiniPlayerBridge.getVideo();
+        if (title == null || channel == null || video == null) {
+            return;
+        }
+        set(title, video.getTitle());
+        set(channel, video.getAuthor());
+    }
+
+    private static void set(TextView view, CharSequence text) {
+        if (!String.valueOf(view.getText()).equals(String.valueOf(text))) {
+            view.setText(text);
+        }
+    }
+}
