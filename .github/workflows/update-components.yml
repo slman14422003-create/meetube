@@ -138,6 +138,18 @@ jobs:
           if gh pr view auto/update-components >/dev/null 2>&1; then
             gh pr edit auto/update-components --body "$body"
           else
-            gh pr create --head auto/update-components --base "$BASE" \
-              --title "Update MediaServiceCore and SharedModules" --body "$body"
+            if ! gh pr create --head auto/update-components --base "$BASE" \
+                --title "Update MediaServiceCore and SharedModules" --body "$body"; then
+              # The repository forbids Actions from opening pull requests. The branch is pushed and
+              # already built, so say where to open it by hand instead of failing the run.
+              link="https://github.com/${{ github.repository }}/compare/$BASE...auto/update-components?expand=1"
+              echo "::warning::Could not open the pull request. Open it here: $link"
+              {
+                echo "### The update is ready on branch \`auto/update-components\`"
+                echo
+                echo "[Open the pull request]($link)"
+                echo
+                echo "To open it automatically next time: Settings > Actions > General > Workflow permissions > tick *Allow GitHub Actions to create and approve pull requests*."
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
           fi
