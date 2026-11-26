@@ -416,7 +416,7 @@ public final class HomePreview implements HomePreviewPlayer.Callback {
         view.setVisibility(View.GONE);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(dp(34), dp(34), Gravity.TOP | Gravity.END);
         lp.topMargin = dp(8) + row * dp(42);
-        lp.rightMargin = dp(8);
+        lp.setMarginEnd(dp(8));
         mOverlay.addView(view, lp);
         return view;
     }

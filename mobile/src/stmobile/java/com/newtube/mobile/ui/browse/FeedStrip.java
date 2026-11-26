@@ -332,7 +332,7 @@ final class FeedStrip extends RecyclerView.Adapter<FeedStrip.Holder> {
                 chip.setPadding(dp(context, 14), 0, dp(context, 14), 0);
                 RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT, dp(context, 36));
-                lp.rightMargin = dp(context, 8);
+                lp.setMarginEnd(dp(context, 8));
                 chip.setLayoutParams(lp);
                 chip.setElevation(dp(context, 4));
                 // MEETUBE(glass): frosted, saturated feed under each pill (liquid: grain + rim too);

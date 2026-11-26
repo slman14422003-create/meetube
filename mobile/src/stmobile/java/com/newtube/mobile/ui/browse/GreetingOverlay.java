@@ -44,8 +44,6 @@ public final class GreetingOverlay {
     private final View mOverlay;
     private final View mBlurTarget;
     private final ViewGroup mContent;
-    private final TextView mTitle;
-    private final TextView mLine;
     private final View mStats;
     private final View mTimer;
     private final Runnable mTimerTick = this::bindTimer;
@@ -63,8 +61,6 @@ public final class GreetingOverlay {
         mOverlay = overlay;
         mBlurTarget = blurTarget;
         mContent = overlay.findViewById(R.id.mobile_greet_content);
-        mTitle = overlay.findViewById(R.id.mobile_greet_title);
-        mLine = overlay.findViewById(R.id.mobile_greet_line);
         Glass.blur(mOverlay, mBlurTarget);
         mOverlay.setOnClickListener(v -> hide());
         mContent.setOnClickListener(v -> hide()); // the scroll view above eats taps on empty space
@@ -127,10 +123,6 @@ public final class GreetingOverlay {
     }
 
     public void show() {
-        mTitle.setText(PERIODS[period(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))]);
-        String[] quotes = mActivity.getResources().getStringArray(R.array.mobile_greet_quotes);
-        sLastQuote = nextQuote(quotes.length, sLastQuote, new java.util.Random());
-        mLine.setText(quotes[sLastQuote]);
         bindStats();
         bindTimer();
 
@@ -303,8 +295,6 @@ public final class GreetingOverlay {
         number(numbers, String.valueOf(itemCount(0)),
                 mMeeTune ? R.string.meetune_filter_songs : R.string.mobile_stats_videos);
         number(numbers, UsageStats.duration(week / 7), R.string.mobile_stats_avg);
-        ((TextView) mStats.findViewById(R.id.stats_week_title)).setText(
-                context.getString(R.string.mobile_stats_week_title, UsageStats.duration(week)));
 
         int accent = com.google.android.material.color.MaterialColors.getColor(mStats,
                 androidx.appcompat.R.attr.colorPrimary);

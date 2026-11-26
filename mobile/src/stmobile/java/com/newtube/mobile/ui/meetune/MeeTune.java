@@ -916,7 +916,16 @@ public final class MeeTune {
                 }
                 brand.getLocationInWindow(at);
                 ((android.view.View) hint.getParent()).getLocationInWindow(home);
-                float x = at[0] - home[0] - hint.getLeft();
+                // Line the hint up with the brand pill's own edge: its start in LTR, its end in RTL
+                // (Arabic puts the pill at the right, so a left-aligned hint ran off the screen), then
+                // keep it fully on screen.
+                float brandWidth = brand.getWidth() * brand.getScaleX();
+                boolean rtl = hint.getLayoutDirection() == android.view.View.LAYOUT_DIRECTION_RTL;
+                float left = rtl ? at[0] - home[0] + brandWidth - hint.getWidth() : at[0] - home[0];
+                float edge = 8 * activity.getResources().getDisplayMetrics().density;
+                float maxLeft = ((android.view.View) hint.getParent()).getWidth() - hint.getWidth() - edge;
+                left = Math.max(edge, Math.min(left, maxLeft));
+                float x = left - hint.getLeft();
                 float y = at[1] - home[1] + brand.getHeight() * brand.getScaleY() + gap - hint.getTop();
                 if (hint.getTranslationX() != x || hint.getTranslationY() != y) {
                     hint.setTranslationX(x);
