@@ -27,6 +27,8 @@
     <string name="mobile_settings_account_switch">Switch or manage accounts</string>
     <string name="mobile_settings_group_app">App</string>
     <string name="mobile_settings_group_video">Video and audio</string>
+    <string name="mobile_settings_group_content">Content and privacy</string>
+    <string name="mobile_settings_group_device">Data and performance</string>
     <string name="mobile_settings_group_other">Other</string>
     <string name="mobile_settings_general">General</string>
     <string name="mobile_settings_general_summary">Language, country, voice search, clock</string>

@@ -108,6 +108,24 @@
     <string name="mobile_watch_share_subject">شاهد هذا الفيديو</string>
     <string name="mobile_watch_share_at">المشاركة بدءًا من %1$s</string>
     <string name="mobile_comments_entry">التعليقات</string>
+    <string name="mobile_settings_card_style">نمط البطاقة</string>
+    <string name="mobile_you_about">حول MeeTube  ‹</string>
+    <string name="mobile_card_style_plain">بسيط</string>
+    <string name="mobile_card_style_plain_desc">زجاج خافت على الأسود بحافة زجاجية، دون لون مميز</string>
+    <string name="mobile_card_style_minimal">MeeTube البسيط</string>
+    <string name="mobile_card_style_minimal_desc">توهج ناعم بلون التمييز في أعلى اليمين، وتدفأ الحافة عند أسفل اليمين</string>
+    <string name="mobile_card_style_ember">جمرة الزاوية</string>
+    <string name="mobile_card_style_ember_desc">أسود تقريبًا، مع ضوء واحد بلون التمييز مجمّع في أسفل اليمين</string>
+    <string name="mobile_card_style_frosted">زجاج مصنفر</string>
+    <string name="mobile_card_style_frosted_desc">زجاج حليبي فوق ضوء ملوّن ضبابي</string>
+    <string name="mobile_card_style_mist">ضباب اللون</string>
+    <string name="mobile_card_style_mist_desc">طيف خافت من لون التمييز يتلاشى من اليسار</string>
+    <string name="mobile_card_style_rim">حافة مضيئة</string>
+    <string name="mobile_card_style_rim_desc">لون التمييز على الحافة العلوية فقط</string>
+    <string name="mobile_card_style_dual">ضوء مزدوج</string>
+    <string name="mobile_card_style_dual_desc">توهج بلون التمييز في الأسفل وإضاءة بيضاء في الأعلى</string>
+    <string name="mobile_hype_title">شجّع هذا الفيديو</string>
+    <string name="mobile_hype_points">نقاط التشجيع</string>
     <string name="mobile_comments_title">التعليقات</string>
     <string name="mobile_comments_replies_title">الردود</string>
     <string name="mobile_comments_none">لا توجد تعليقات بعد</string>
@@ -216,6 +234,8 @@
     <string name="mobile_subs_all_channels">كل الاشتراكات</string>
     <string name="mobile_you_explore">استكشاف</string>
     <string name="mobile_you_library">المكتبة</string>
+    <string name="mobile_you_watch_later">المشاهدة لاحقًا</string>
+    <string name="mobile_you_liked_videos">الفيديوهات التي أعجبتك</string>
     <string name="mobile_no_browser">لم يتم العثور على تطبيق لفتح هذا الرابط</string>
     <string name="mobile_add_device_title">إقران جهاز</string>
     <string name="mobile_add_device_done">تم</string>
@@ -285,12 +305,19 @@
     <string name="pin_channel">تثبيت القناة في «أنت»</string>
     <string name="pinned_to_sidebar">تم التثبيت في «أنت»</string>
     <string name="unpin_from_sidebar">إلغاء التثبيت من «أنت»</string>
+    <string name="unpin_playlist">إزالة من قوائم التشغيل المحفوظة</string>
     <string name="unpinned_from_sidebar">تم إلغاء التثبيت من «أنت»</string>
     <string name="subscribe_to_channel">اشتراك</string>
     <string name="unsubscribe_from_channel">إلغاء الاشتراك</string>
     <string name="subscribe_unsubscribe_from_channel">اشتراك أو إلغاء الاشتراك</string>
     <string name="share_link">مشاركة</string>
     <string name="mobile_you_pinned">المثبّتة</string>
+    <string name="mobile_you_pinned_channels">القنوات المثبّتة</string>
+    <string name="mobile_you_saved_playlists">قوائم التشغيل المحفوظة</string>
+    <string name="mobile_playlist_save">حفظ قائمة التشغيل</string>
+    <string name="mobile_playlist_unsave">إزالة من قوائم التشغيل المحفوظة</string>
+    <string name="mobile_playlist_saved">تم الحفظ في قسم «أنت»</string>
+    <string name="mobile_playlist_unsaved">تمت الإزالة من قوائم التشغيل المحفوظة</string>
     <string name="pin_unpin_from_sidebar">تثبيت في «أنت»</string>
     <string name="mobile_settings_experimental">تجريبية</string>
     <string name="mobile_settings_gestures">الإيماءات</string>
@@ -326,6 +353,9 @@
     <string name="mobile_cast_direct_load_failed">تعذّر تجهيز هذا الفيديو للبث المباشر إلى الجهاز</string>
     <string name="mobile_cast_direct_no_wifi">يتطلّب البث المباشر إلى الجهاز اتصال الهاتف والتلفزيون بشبكة Wi-Fi نفسها</string>
     <string name="mobile_cast_link_code">الربط باستخدام رمز التلفزيون</string>
+    <string name="mobile_cast_car">السيارة</string>
+    <string name="mobile_cast_car_subtitle">يواصل MeeTune التشغيل في السيارة</string>
+    <string name="mobile_cast_car_playing">قيد التشغيل في السيارة</string>
     <string name="mobile_cast_link_code_subtitle">يعمل مع YouTube وMeeTube TV / SmartTube TV</string>
     <string name="mobile_cast_code_hint">رمز من 12 رقمًا</string>
     <string name="mobile_cast_code_title">ربط التلفزيون</string>
@@ -404,6 +434,14 @@
     <string name="mobile_download_unavailable">لا يمكن تنزيل هذا الفيديو</string>
     <string name="mobile_download_unavailable_live">لا يمكن تنزيل فيديوهات البث المباشر</string>
     <string name="mobile_download_audio_only">الصوت فقط</string>
+    <string name="mobile_download_part">تنزيل جزء</string>
+    <string name="mobile_download_part_description">اختر موضع البداية والنهاية</string>
+    <string name="mobile_download_part_start">البداية</string>
+    <string name="mobile_download_part_end">النهاية</string>
+    <string name="mobile_download_part_next">التالي</string>
+    <string name="mobile_download_part_invalid">استخدم أوقاتًا مثل 1:30 على أن تكون النهاية بعد البداية</string>
+    <string name="mobile_download_part_title">تنزيل %1$s</string>
+    <string name="mobile_download_part_note">يتم تنزيل هذا الجزء فقط. فوق 1080p يُنزَّل الفيديو كاملًا أولًا ثم يُقتطع الجزء.</string>
     <string name="mobile_download_already">تم تنزيله من قبل</string>
     <string name="mobile_download_state_queued">في انتظار التنزيل</string>
     <string name="mobile_download_state_downloading">جارٍ التنزيل · %1$d%% · %2$s من %3$s</string>
@@ -411,6 +449,9 @@
     <string name="mobile_download_time_left">متبقٍ %1$s</string>
     <string name="mobile_download_state_processing">جارٍ الإنهاء…</string>
     <string name="mobile_download_error_generic">تعذّر التنزيل. انقر لإعادة المحاولة.</string>
+    <string name="mobile_download_error_space">لا توجد مساحة تخزين كافية للحفظ. حرّر بعض المساحة ثم انقر لإعادة المحاولة.</string>
+    <string name="mobile_download_error_save">تم التنزيل لكن فشل حفظ الفيديو (%1$s). انقر لإعادة المحاولة.</string>
+    <string name="mobile_download_error_detail">فشل التنزيل (%1$s). انقر لإعادة المحاولة.</string>
     <string name="mobile_download_error_link">انتهت صلاحية رابط التنزيل. انقر لإعادة المحاولة.</string>
     <string name="mobile_download_done_title">اكتمل التنزيل</string>
     <string name="mobile_download_open_folder">فتح في المجلد</string>
@@ -481,6 +522,20 @@
     <string name="mobile_update_row_ready">التحديث جاهز للتثبيت</string>
     <string name="mobile_update_channel_name">تحديثات التطبيق</string>
     <string name="mobile_update_channel_desc">تنزيل تحديث MeeTube</string>
+    <string name="mobile_new_uploads_channel">التحميلات الجديدة</string>
+    <string name="mobile_new_uploads_channel_desc">فيديوهات جديدة من القنوات التي اشتركت فيها</string>
+    <string name="mobile_channel_bell">الإشعارات لهذه القناة</string>
+    <string name="mobile_channel_bell_on">الإشعارات مفعّلة لهذه القناة</string>
+    <string name="mobile_channel_bell_off">الإشعارات متوقفة لهذه القناة</string>
+    <string name="mobile_channel_bell_on_done">ستصلك إشعارات بفيديوهات %1$s الجديدة</string>
+    <string name="mobile_channel_bell_off_done">لن تصلك إشعارات أخرى من %1$s</string>
+    <string name="mobile_channel_bell_on_master_off">إشعارات التحميلات الجديدة متوقفة في الإعدادات</string>
+    <string name="mobile_channel_bell_turn_on">تفعيل</string>
+    <string name="mobile_update_notify_channel">الإصدارات الجديدة</string>
+    <string name="mobile_update_notify_channel_desc">عند صدور إصدار جديد من MeeTube</string>
+    <string name="mobile_update_notify_title">يتوفر تحديث جديد ✨</string>
+    <string name="mobile_update_notify_text">وصل MeeTube %1$s. اضغط لمعرفة الجديد</string>
+    <string name="mobile_update_notify_love">صُنع بحب وببعض الليالي بلا نوم. إن جعل MeeTube يومك أجمل قليلًا، فقهوة ☕ تُبقيه مستمرًا. دون أي إلزام ❤️</string>
     <string name="mobile_theme">المظهر</string>
     <string name="mobile_theme_system">الإعداد التلقائي للنظام</string>
     <string name="mobile_theme_light">فاتح</string>
@@ -496,6 +551,34 @@
     <string name="mobile_about_log_short">إرسال السجلّ</string>
     <string name="mobile_about_creator">المطوّر</string>
     <string name="mobile_about_coffee_note"><![CDATA[<font color="#FF5F56">●</font> <font color="#FFBD2E">●</font> <font color="#27C93F">●</font><br><br><font color="#4ADE80">$</font> meetube --thank-you<br><font color="#E6EDF3">&#160;&#160;ads: 0 | sponsors: skipped</font><br><font color="#8B949E">// built at 3am on pure caffeine<br>// refill? totally optional :)</font>]]></string>
+    <string name="mobile_stats_today">اليوم</string>
+    <string name="mobile_stats_hero_label">في MeeTube اليوم</string>
+    <string name="mobile_stats_videos">الفيديوهات</string>
+    <string name="mobile_stats_week_title">آخر 7 أيام · %1$s</string>
+    <string name="mobile_stats_tap">اضغط على عمود لعرض ذلك اليوم</string>
+    <string name="mobile_stats_avg">المتوسط اليومي</string>
+    <string name="mobile_stats_watched">شاهدت</string>
+    <string name="mobile_stats_day">%1$s: %2$s في MeeTube، %3$s مشاهدة، %4$s فيديو</string>
+    <string name="mobile_stats_storage_header">إحصاءاتك</string>
+    <string name="mobile_stats_delete">حذف إحصاءاتي</string>
+    <string name="mobile_stats_delete_confirm">هل تريد حذف إحصاءاتك؟</string>
+    <string name="mobile_stats_delete_body">الوقت المستغرق ووقت المشاهدة والفيديوهات المحتسبة، لكل يوم. ستبدأ من الصفر مرة أخرى.</string>
+    <string name="mobile_stats_private">تُحفظ إحصاءاتك (الوقت في MeeTube ووقت المشاهدة والفيديوهات التي بدأت) على هذا الهاتف فقط. لا يتم رفعها أو مشاركتها أبدًا: لا تغادر أي بيانات جهازك.</string>
+    <string name="mobile_stats_on_device">🔒 على هذا الهاتف فقط. لا شيء يغادر جهازك.</string>
+    <plurals name="mobile_stats_delete_summary">
+        <item quantity="zero">لا توجد أيام محفوظة على هذا الهاتف</item>
+        <item quantity="one">يوم واحد محفوظ على هذا الهاتف</item>
+        <item quantity="two">يومان محفوظان على هذا الهاتف</item>
+        <item quantity="few">%d أيام محفوظة على هذا الهاتف</item>
+        <item quantity="many">%d يومًا محفوظًا على هذا الهاتف</item>
+        <item quantity="other">%d يوم محفوظ على هذا الهاتف</item>
+    </plurals>
+    <string name="mobile_about_tv_badge">جديد</string>
+    <string name="mobile_about_tv_title">وصل MeeTube TV 📺</string>
+    <string name="mobile_about_tv_text">كل ما تحبه هنا، الآن على الشاشة الكبيرة. شريط جانبي زجاجي، وفيديوهات Shorts تتوهج داخل بطاقاتها، وتسجيل الدخول بواسطة رمز. أريكتك تناديك.</string>
+    <string name="mobile_about_tv_button">التثبيت على تلفازي</string>
+    <string name="mobile_about_tv_repo">⭐ ضع نجمة عليه في GitHub، أو نزّل ملف APK بنفسك</string>
+    <string name="mobile_about_tv_shot">الشاشة الرئيسية في MeeTube TV على تلفاز</string>
     <string name="mobile_about_reporters">المبلّغون عن المشاكل</string>
     <string name="mobile_about_reporters_summary">شكرًا لجميع المبلّغين عن المشاكل</string>
     <string name="mobile_about_reporters_note">شكرًا لكل من فتح بلاغًا. ساعد كل بلاغ وكل اقتراح في تحسين MeeTube.</string>
@@ -514,6 +597,8 @@
     <string name="mobile_about_contributors_code">البرمجة والترجمة</string>
     <string name="mobile_about_contributors_built_on">مبني على</string>
     <string name="mobile_about_credit_zh_tw">الترجمة الصينية التقليدية (#14)</string>
+    <string name="mobile_about_credit_ru">الترجمة الروسية (#194)</string>
+    <string name="mobile_about_credit_icons">أيقونات التطبيق Red CRT وChrome Play وPixel Play وStarry Night وGTA VI (#193)</string>
     <string name="mobile_about_credit_smarttube">SmartTube: المشغّل وخدمات YouTube الخلفية التي يعتمد عليها MeeTube</string>
     <string name="mobile_about_credit_newtube">NewTube: تطبيق الهاتف الذي نشأ منه MeeTube</string>
     <string name="mobile_about_credit_backdrop">Backdrop: عدسة الزجاج السائل على الأشرطة</string>
@@ -529,7 +614,59 @@
     <string name="mobile_greet_afternoon">طاب نهارك</string>
     <string name="mobile_greet_evening">مساء الخير</string>
     <string name="mobile_greet_night">ليلة سعيدة</string>
+    <string-array name="mobile_greet_quotes">
+        <item>«سرّ التقدّم هو أن تبدأ.»\nمارك توين</item>
+        <item>«العمل المتقن خير من القول البليغ.»\nبنجامين فرانكلين</item>
+        <item>«لا يهم مدى بطء سيرك ما دمت لا تتوقف.»\nكونفوشيوس</item>
+        <item>«رحلة الألف ميل تبدأ بخطوة واحدة.»\nلاو تسي</item>
+        <item>«البساطة هي قمة الرقيّ.»\nليوناردو دا فينشي</item>
+        <item>«كن نفسك؛ فالأدوار الأخرى محجوزة.»\nأوسكار وايلد</item>
+        <item>«مهما كنت، كن الأفضل في ذلك.»\nأبراهام لينكولن</item>
+        <item>«في قلب الصعوبة تكمن الفرصة.»\nألبرت أينشتاين</item>
+        <item>«معرفة النفس بداية كل حكمة.»\nأرسطو</item>
+        <item>«السعادة تعتمد علينا نحن.»\nأرسطو</item>
+        <item>«أفضل مخرج هو دائمًا عبر الطريق نفسه.»\nروبرت فروست</item>
+        <item>«لا شيء ينجح ما لم تعمل أنت.»\nمايا أنجيلو</item>
+        <item>«ابقَ جائعًا، ابقَ شغوفًا.»\nستيف جوبز</item>
+        <item>«الحياة هي ما يحدث بينما أنت منشغل بوضع خطط أخرى.»\nجون لينون</item>
+        <item>«تصرّف كأن ما تفعله يصنع فرقًا. فهو كذلك.»\nويليام جيمس</item>
+        <item>«تأمّل جمال الحياة.»\nماركوس أوريليوس</item>
+        <item>«كفّ عن إضاعة الوقت في الجدال حول صفات الرجل الصالح. كن واحدًا منهم.»\nماركوس أوريليوس</item>
+        <item>«الحظ هو ما يحدث حين يلتقي الاستعداد بالفرصة.»\nسينيكا</item>
+        <item>«بينما ننتظر الحياة، تمضي الحياة.»\nسينيكا</item>
+        <item>«تخسر كل تسديدة لا تحاولها.»\nواين غريتزكي</item>
+        <item>«حوّل جراحك إلى حكمة.»\nأوبرا وينفري</item>
+        <item>«ليس كل من يتجول تائهًا.»\nج. ر. ر. تولكين</item>
+        <item>«الطريقة الوحيدة لإنجاز عمل عظيم هي أن تحب ما تفعله.»\nستيف جوبز</item>
+        <item>«شيئًا فشيئًا، يقطع المرء مسافة بعيدة.»\nج. ر. ر. تولكين</item>
+        <item>«إن كنت تمرّ بالجحيم فواصل السير.»\nونستون تشرشل</item>
+        <item>«افعل ما تستطيع، بما لديك، حيث أنت.»\nثيودور روزفلت</item>
+        <item>«نصبح ما نفكر فيه.»\nبوذا</item>
+        <item>«كل لحظة بداية جديدة.»\nت. س. إليوت</item>
+    </string-array>
+    <string name="mobile_focus_idle">المؤقت · %d د</string>
+    <string name="mobile_focus_running">المؤقت · %s</string>
+    <string name="mobile_focus_start">بدء المؤقت</string>
+    <string name="mobile_focus_stop">إيقاف المؤقت</string>
+    <string name="mobile_focus_started">المؤقت قيد التشغيل: %d د. سآتي للاطمئنان عليك.</string>
+    <string name="mobile_focus_title">هل تنجح يا بني؟</string>
+    <plurals name="mobile_focus_message">
+        <item quantity="zero">انتهت دقائقك. حان وقت التركيز. ستبقى الفيديوهات هنا، أعدك وعدًا صادقًا.</item>
+        <item quantity="one">انتهت دقيقتك. حان وقت التركيز. ستبقى الفيديوهات هنا، أعدك وعدًا صادقًا.</item>
+        <item quantity="two">انتهت دقيقتاك. حان وقت التركيز. ستبقى الفيديوهات هنا، أعدك وعدًا صادقًا.</item>
+        <item quantity="few">انتهت دقائقك الـ %d. حان وقت التركيز. ستبقى الفيديوهات هنا، أعدك وعدًا صادقًا.</item>
+        <item quantity="many">انتهت دقائقك الـ %d. حان وقت التركيز. ستبقى الفيديوهات هنا، أعدك وعدًا صادقًا.</item>
+        <item quantity="other">انتهت دقائقك الـ %d. حان وقت التركيز. ستبقى الفيديوهات هنا، أعدك وعدًا صادقًا.</item>
+    </plurals>
+    <string name="mobile_focus_win">نعم، أركّز</string>
+    <string name="mobile_focus_snooze">5 دقائق أخرى</string>
+    <string name="mobile_focus_won">أحسنت يا بطل. انطلق.</string>
+    <string name="mobile_focus_snoozed">5 دقائق. أنا أعدّ.</string>
+    <string name="mobile_focus_snoozed_again">مرة أخرى؟ حسنًا، آخر 5 دقائق. ربما.</string>
+    <string name="mobile_focus_custom_title">مؤقت مخصص</string>
+    <string name="mobile_focus_custom_hint">الدقائق (من 1 إلى 600)</string>
     <string name="mobile_shorts_clean_on">الأزرار مخفية. اضغط مطولًا لإعادتها</string>
     <string name="mobile_shorts_clean_off">عادت الأزرار. اضغط مطولًا لإخفائها</string>
     <string name="mobile_shorts_clean_tip">نصيحة: اضغط مطولًا على أي Short لإخفاء أزراره</string>
+    <string name="mobile_player_most_replayed">الأكثر إعادة للمشاهدة</string>
 </resources>

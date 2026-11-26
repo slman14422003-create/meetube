@@ -223,10 +223,10 @@
 
     <style name="ShapeAppearance.NewTube.BottomSheet" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopLeft">28dp</item>
-        <item name="cornerSizeTopRight">28dp</item>
-        <item name="cornerSizeBottomLeft">28dp</item>
-        <item name="cornerSizeBottomRight">28dp</item>
+        <item name="cornerSizeTopLeft">18dp</item>
+        <item name="cornerSizeTopRight">18dp</item>
+        <item name="cornerSizeBottomLeft">18dp</item>
+        <item name="cornerSizeBottomRight">18dp</item>
     </style>
 
     <!--
@@ -358,7 +358,7 @@
     </style>
 
     <style name="MobileAlertDialogShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
-        <item name="cornerSize">28dp</item>
+        <item name="cornerSize">18dp</item>
     </style>
 
     <style name="MobileAlertDialogBody" parent="MaterialAlertDialog.MaterialComponents.Body.Text">

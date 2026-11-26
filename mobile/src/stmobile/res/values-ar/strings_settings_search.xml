@@ -38,9 +38,14 @@
     <string name="mobile_settings_search_kw_gesture_seek">إيماءات سحب تخطي تقديم ترجيع</string>
     <string name="mobile_settings_search_kw_double_tap_seek">نقر مرتين تقديم ترجيع تخطي ثواني قفز فاصل</string>
     <string name="mobile_settings_search_kw_loader">مؤشر تحميل دوران تقدم نيون مصنفر زجاج بسكويت سائل حلقة كرة كتلة مدار</string>
+    <string name="mobile_settings_search_kw_badge_icons">مزيج موسيقى نغمة أيقونة رمز شارة مدة وقت</string>
+    <string name="mobile_settings_search_kw_seek_pill">نقر مزدوج تخطي تقديم ترجيع 10 ثوانٍ حركة تموج</string>
     <string name="mobile_settings_search_kw_watched_bar">مشاهدة تقدم أحمر خط شريط سجل صورة مصغرة</string>
+    <string name="mobile_settings_search_kw_home_chips">شرائح مواضيع تصنيفات عوامل تصفية الرئيسية إخفاء إظهار</string>
+    <string name="mobile_settings_search_kw_haptics">اهتزاز ارتعاش طنين ملاحظات لمس إيقاف</string>
     <string name="mobile_settings_search_kw_refresh_sound">تحديث صوت فرقعة سحب تمرير ضجيج كتم</string>
     <string name="mobile_settings_search_kw_short_ends">Shorts حلقة تكرار تمرير تلقائي تالي سحب</string>
     <string name="mobile_settings_search_kw_stable_volume">ثبات مستوى صوت drc ضغط نطاق ديناميكي مرتفع منخفض</string>
     <string name="mobile_settings_search_kw_equalizer">معادل eq صوت جهير حاد ترددات نطاقات إعدادات مسبقة مخصص</string>
+    <string name="mobile_settings_search_web_signin">دردشة جوجل تسجيل دخول ملفات تعريف الارتباط حساب جلسة إرسال رسالة</string>
 </resources>
