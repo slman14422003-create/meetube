@@ -80,12 +80,12 @@
 
     <ImageView
         android:id="@+id/meetune_queue_remove"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginStart="4dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/meetune_queue_remove"
-        android:padding="12dp"
+        android:padding="16dp"
         android:src="@drawable/ic_sheet_close"
         android:tint="#B3FFFFFF" />
 

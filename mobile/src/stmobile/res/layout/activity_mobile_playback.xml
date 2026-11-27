@@ -433,11 +433,11 @@
                          back (chevron up) the row of actions under the seek bar. -->
                     <ImageButton
                         android:id="@+id/mobile_player_actions_toggle"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/mobile_player_hide_actions"
-                        android:padding="10dp"
+                        android:padding="14dp"
                         android:scaleType="fitCenter"
                         android:src="@drawable/ic_chips_expand"
                         android:visibility="gone" />
