@@ -36,3 +36,9 @@ Compare with -e compilation none as well (profile effect). JankStats budget: sam
 Regenerate the Home/MeeTune/Greeting profile: -e class com.newtube.benchmark.HomeBaselineProfileGenerator, then copy the *-baseline-prof.txt over the hand-added block in mobile/src/main/baseline-prof.txt.
 
 - CI fix: common/build.gradle had shrinkResources true on a library; Gradle 9.6/AGP 9 fail project evaluation with "Resource shrinker cannot be used for libraries". Removed it (mobile still shrinks resources for the APK). It predates steps 5-6.
+
+## CI release failure (run of 2026-11-27, version 5.0.2)
+- Symptom: :mobile:packageStmobileRelease failed in PackageAndroidArtifact$IncrementalSplitterRunnable with no nested cause in the log. Everything before it (R8, resource shrinking, resource optimization, embedded ART profile) passed.
+- The runner had moved to ubuntu-26.04 (ubuntu-latest). Workflows now use ubuntu-24.04 (ci.yml, release.yml, update-components.yml) so the build does not depend on the moving image.
+- Build steps run Gradle with --stacktrace, and ci.yml/release.yml upload build/reports/problems and mobile/build/reports as artifact build-reports on failure, so the root cause is visible if it fails again.
+- Not verified here: no network, Gradle or SDK in the sandbox. If packaging still fails, read the stack trace from the new log and check the keystore secrets (SIGNING_KEY, KEY_STORE_PASSWORD, ALIAS, KEY_PASSWORD) and mobile/src/main/baseline-prof.txt wildcard rules first.
