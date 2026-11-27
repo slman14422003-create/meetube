@@ -278,6 +278,8 @@ final class ColorPickerSheet {
     private static final class HueBar extends View {
         private static final int[] RAINBOW = {0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFFFF00FF, 0xFFFF0000};
         private final float[] mHsv;
+        /** Scratch {hue, 1, 1} for the thumb colour, so onDraw allocates nothing. */
+        private final float[] mHueOnly = {0f, 1f, 1f};
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Thumb mThumb;
         Runnable onChange;
@@ -297,8 +299,9 @@ final class ColorPickerSheet {
         protected void onDraw(Canvas canvas) {
             int w = getWidth();
             int h = getHeight();
+            mHueOnly[0] = mHsv[0]; // PERF: reused array, nothing allocated per frame while dragging
             canvas.drawRoundRect(0, 0, w, h, h / 2f, h / 2f, mPaint);
-            mThumb.draw(canvas, h / 2f + mHsv[0] / 360 * (w - h), h / 2f, Color.HSVToColor(new float[] {mHsv[0], 1, 1}));
+            mThumb.draw(canvas, h / 2f + mHsv[0] / 360 * (w - h), h / 2f, Color.HSVToColor(mHueOnly));
         }
 
         @SuppressLint("ClickableViewAccessibility")
