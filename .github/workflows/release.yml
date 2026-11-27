@@ -34,7 +34,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
       contents: write   # to create the release
@@ -127,7 +127,17 @@ jobs:
       - name: Build
         run: |
           chmod +x gradlew
-          ./gradlew :mobile:assembleStmobileRelease
+          ./gradlew :mobile:assembleStmobileRelease --stacktrace
+
+      - name: Build reports on failure
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: build-reports
+          path: |
+            build/reports/problems/problems-report.html
+            mobile/build/reports
+          if-no-files-found: ignore
 
       - name: Remove the signing key
         if: always()

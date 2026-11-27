@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       changed: ${{ steps.pins.outputs.changed }}
       summary: ${{ steps.pins.outputs.summary }}
@@ -71,7 +71,7 @@ jobs:
   verify:
     needs: check
     if: needs.check.outputs.changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - name: Checkout
@@ -102,11 +102,11 @@ jobs:
       - name: Build with the new commits
         run: |
           chmod +x gradlew
-          ./gradlew :mobile:assembleStmobileRelease
+          ./gradlew :mobile:assembleStmobileRelease --stacktrace
 
   pull-request:
     needs: [check, verify]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
       pull-requests: write
