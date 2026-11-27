@@ -27,12 +27,26 @@ import java.util.List;
  */
 public class LiveChatAdapter extends RecyclerView.Adapter<LiveChatAdapter.VH> {
 
+    /**
+     * PERF: a live chat is endless (hours of stream, hundreds of messages a minute on a busy one).
+     * Unbounded, the list - and every ChatItem with its Spannable-ready strings - only grew, and
+     * the RecyclerView's scroll range with it. Only the newest rows are ever read, so the oldest
+     * are dropped once the list passes this size.
+     */
+    private static final int MAX_ITEMS = 500;
+    /** Rows dropped in one go, so a busy chat trims once per batch instead of on every message. */
+    private static final int TRIM_BATCH = 100;
+
     private final List<ChatItem> mItems = new ArrayList<>();
 
     public void setItems(List<ChatItem> items) {
         mItems.clear();
         if (items != null) {
             mItems.addAll(items);
+            int extra = mItems.size() - MAX_ITEMS;
+            if (extra > 0) {
+                mItems.subList(0, extra).clear();
+            }
         }
         notifyDataSetChanged();
     }
@@ -44,6 +58,11 @@ public class LiveChatAdapter extends RecyclerView.Adapter<LiveChatAdapter.VH> {
         }
         mItems.add(item);
         notifyItemInserted(mItems.size() - 1);
+        if (mItems.size() > MAX_ITEMS + TRIM_BATCH) {
+            int drop = mItems.size() - MAX_ITEMS;
+            mItems.subList(0, drop).clear();
+            notifyItemRangeRemoved(0, drop);
+        }
         return mItems.size();
     }
 
