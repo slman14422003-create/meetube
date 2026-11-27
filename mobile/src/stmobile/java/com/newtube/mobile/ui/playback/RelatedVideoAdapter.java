@@ -80,17 +80,28 @@ public class RelatedVideoAdapter extends ListAdapter<Video, RelatedVideoAdapter.
     }
 
     /**
-     * Marks one row as the playing one. Rebinds every row rather than diffing: the flag lives
-     * outside the {@link Video} objects, so {@link #DIFF_CALLBACK} (identity-based by design)
-     * cannot see it change, and both the OLD and the NEW current row need repainting.
+     * Marks one row as the playing one. The flag lives outside the {@link Video} objects, so
+     * {@link #DIFF_CALLBACK} (identity-based by design) cannot see it change: the OLD and the NEW
+     * current row are repainted by hand. PERF: only those two rows, not the whole list - a full
+     * notifyDataSetChanged() rebinds every visible row (and re-requests every thumbnail) each time
+     * the queue advances.
      */
     public void setCurrentVideoId(String videoId) {
         if (android.text.TextUtils.equals(mCurrentVideoId, videoId)) {
             return;
         }
 
+        String old = mCurrentVideoId;
         mCurrentVideoId = videoId;
-        notifyDataSetChanged();
+
+        java.util.List<Video> list = getCurrentList();
+        for (int i = 0; i < list.size(); i++) {
+            Video v = list.get(i);
+            String id = v != null ? v.videoId : null;
+            if (id != null && (id.equals(old) || id.equals(videoId))) {
+                notifyItemChanged(i, Boolean.TRUE); // payload: skips the change cross-fade
+            }
+        }
     }
 
     private static final DiffUtil.ItemCallback<Video> DIFF_CALLBACK = new DiffUtil.ItemCallback<Video>() {
