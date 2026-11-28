@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Touch Channel-Uploads list (Wave 4a).
+
+  A single Material RecyclerView GRID of the uploads/playlist contents (reuses
+  VideoCardAdapter + the same runtime span-count math as the Home grid), under a simple
+  Toolbar with the list title + a back arrow. No bottom nav: this is a pushed detail
+  screen (parent = MobileBrowseActivity), so back returns to wherever it was opened from.
+
+  A PLAYLIST also gets a header (cover, name, owner, count, Play all + Shuffle) like the
+  YouTube playlist page - it is the grid's first full-span ITEM, see
+  {@code item_mobile_playlist_header.xml}. Channel uploads have no playlist behind them, so
+  they show no header and keep the compact "Play all" button in the toolbar instead.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<FrameLayout
+    android:id="@+id/mobile_channel_uploads_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- MEETUBE(glass): the page is a GlassSource; the top bar (and Select videos' bar) frost it. -->
+    <com.newtube.mobile.ui.common.GlassSource
+        android:id="@+id/mobile_channel_uploads_glass"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/mobile_color_background">
+
+    <!-- MEETUBE(playlist page): follows the scrolling header, full bleed behind the toolbar and cards. -->
+    <FrameLayout
+        android:id="@+id/mobile_channel_uploads_ambient"
+        android:layout_width="match_parent"
+        android:layout_height="640dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/mobile_channel_uploads_backdrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            android:scaleX="1.15"
+            android:scaleY="1.15" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/mobile_playlist_header_scrim" />
+
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Pull-to-refresh reloads the list (ChannelUploadsPresenter.reload), like Home; the items
+             on screen stay until fresh ones land. Also the retry gesture over the failure state,
+             which doesn't consume touches. -->
+        <com.newtube.mobile.ui.common.HapticSwipeRefreshLayout
+            android:id="@+id/mobile_channel_uploads_swipe"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/mobile_channel_uploads_grid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="@dimen/mobile_card_spacing"
+                android:paddingTop="@dimen/mobile_title_bar_height"
+                android:paddingBottom="@dimen/mobile_card_spacing"
+                android:scrollbars="none"
+                tools:listitem="@layout/item_video_card" />
+
+        </com.newtube.mobile.ui.common.HapticSwipeRefreshLayout>
+
+        <!-- First page failed / came back empty: message + Try again (PageLoadState). The grid
+             (and with it the playlist header row) is GONE while this shows. -->
+        <include layout="@layout/mobile_page_load_state" />
+
+        <ProgressBar
+            style="@style/Widget.MeeTube.GlassSpinner"
+            android:id="@+id/mobile_channel_uploads_progress"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    </com.newtube.mobile.ui.common.GlassSource>
+
+    <!-- The top bar: frosted over the page, thinning out at its bottom edge like Settings'. -->
+    <com.newtube.mobile.ui.common.GlassView
+        android:id="@+id/mobile_channel_uploads_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mobile_playlist_bar_glass"
+        app:glassCornerRadius="0dp"
+        app:glassFadeBottom="@dimen/mobile_settings_bar_fade"
+        app:glassLiquid="false"
+        app:glassTint="@color/meetube_glass_tint">
+
+    <LinearLayout
+        android:id="@+id/mobile_channel_uploads_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mobile_title_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/mobile_channel_uploads_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_glass_circle"
+            android:contentDescription="@string/mobile_back"
+            android:padding="8dp"
+            android:src="@drawable/ic_mobile_back_arrow"
+            android:stateListAnimator="@animator/press_3d" />
+
+        <TextView
+            android:id="@+id/mobile_channel_uploads_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingEnd="16dp"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Daily Top Music Videos" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mobile_channel_uploads_play_all"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:backgroundTint="@color/mobile_color_inverse_surface"
+            android:fontFamily="?attr/appFontMedium"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="40dp"
+            android:paddingHorizontal="14dp"
+            android:text="@string/mobile_playlist_play_all"
+            android:textAllCaps="false"
+            android:textColor="@color/mobile_color_on_inverse_surface"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:cornerRadius="20dp"
+            app:icon="@drawable/ic_player_play"
+            app:iconGravity="textStart"
+            app:iconSize="18dp"
+            app:iconTint="@color/mobile_color_on_inverse_surface"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+    </com.newtube.mobile.ui.common.GlassView>
+
+</FrameLayout>
+
+    <!-- Minimizing a video opened from this list keeps playback alive in this overlay. -->
+    <include layout="@layout/mobile_mini_player_overlay" />
+
+</FrameLayout>

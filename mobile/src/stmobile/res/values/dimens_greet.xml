@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="greet_side_padding">20dp</dimen>
+    <dimen name="greet_bars_height">72dp</dimen>
+    <dimen name="greet_pill_height">56dp</dimen>
+    <dimen name="greet_hero_size">44sp</dimen>
+</resources>

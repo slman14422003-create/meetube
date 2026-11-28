@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Playlist page header, rendered as the FIRST (full-span) ITEM of the uploads grid.
+
+  MEETUBE(playlist page): cover, title, owner, metadata, Play all, Shuffle, Download all and Sort.
+  The activity draws the scrolling ambient cover behind this row and the top of the list.
+
+  It is a list item rather than an AppBarLayout/CollapsingToolbarLayout child on purpose:
+  AppBarLayout stops counting its scroll range at the first child without a `scroll` flag, so
+  a pinned toolbar above the header froze it in place, and moving the toolbar inside a
+  CollapsingToolbarLayout then hid it (CTL only keeps a real androidx Toolbar visible while
+  collapsed). As a row it just scrolls with the grid, which is what YouTube does anyway.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_channel_uploads_header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="14dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:cardBackgroundColor="@color/mobile_color_placeholder"
+                app:cardCornerRadius="@dimen/mobile_card_corner_radius"
+                app:cardElevation="0dp"
+                app:layout_constraintDimensionRatio="16:9"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/mobile_channel_uploads_cover"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/mobile_channel_uploads_header_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/mobile_color_on_surface"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            tools:text="Lofi Girl - Compilations &amp; Mixes" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/mobile_channel_uploads_header_avatar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@null"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/mobile_channel_uploads_header_owner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/mobile_color_on_surface"
+                android:textSize="14sp"
+                tools:text="by Lofi Girl" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/mobile_channel_uploads_header_meta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/mobile_color_on_surface_secondary"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="51 videos • Private"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mobile_channel_uploads_header_play_all"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:backgroundTint="@android:color/white"
+                android:fontFamily="?attr/appFontMedium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="48dp"
+                android:text="@string/mobile_playlist_play_all"
+                android:textAllCaps="false"
+                android:textColor="@android:color/black"
+                android:textSize="15sp"
+                app:cornerRadius="24dp"
+                app:icon="@drawable/ic_player_play"
+                app:iconGravity="textStart"
+                app:iconSize="20dp"
+                app:iconTint="@android:color/black" />
+
+            <!-- MEETUBE(playlist page): + on Watch later and your own playlists, search to add. -->
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/mobile_channel_uploads_add"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/mobile_playlist_add_videos"
+                android:padding="12dp"
+                android:src="@drawable/ic_mobile_add"
+                android:visibility="gone"
+                app:tint="@color/mobile_color_on_surface" />
+
+            <!-- MEETUBE(issue #242): save someone else's playlist to You, and to the account's library when signed in. -->
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/mobile_channel_uploads_save"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/mobile_playlist_save"
+                android:padding="12dp"
+                android:src="@drawable/ic_mobile_bookmark"
+                android:visibility="gone"
+                app:tint="@color/mobile_color_on_surface" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/mobile_channel_uploads_shuffle"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/mobile_playlist_shuffle"
+                android:padding="13dp"
+                android:src="@drawable/ic_player_shuffle"
+                app:tint="@color/mobile_color_on_surface" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/mobile_channel_uploads_download_all"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/mobile_playlist_download_all"
+                android:padding="13dp"
+                android:src="@drawable/ic_watch_download"
+                app:tint="@color/mobile_color_on_surface" />
+
+        </LinearLayout>
+
+        <!-- MEETUBE(playlist page): the sort chip, then the liquid All | Videos | Shorts segment
+             (GlassChipTrack, the Home chips' control) when the list holds Shorts. -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/mobile_channel_uploads_sort"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_glass_pill"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp">
+
+                <TextView
+                    android:id="@+id/mobile_channel_uploads_sort_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mobile_playlist_sort_manual"
+                    android:textColor="@color/mobile_color_on_surface"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_chips_expand"
+                    app:tint="@color/mobile_color_on_surface" />
+
+                <ProgressBar
+                    android:id="@+id/mobile_channel_uploads_sort_progress"
+                    style="@style/Widget.MeeTube.GlassSpinner"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <com.newtube.mobile.ui.common.GlassChipTrack
+                android:id="@+id/mobile_playlist_filters"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
