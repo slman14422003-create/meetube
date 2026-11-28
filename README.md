@@ -5,11 +5,10 @@
 > [!IMPORTANT]
 > Not affiliated with, endorsed by, or connected to YouTube or Google. Use it at your own discretion.
 
-A YouTube video and music client in one app: **MeeTube** for videos and **MeeTune**, its music side, one tap away. No ads, a liquid-glass interface, synced lyrics, background playback and downloads.
+A YouTube video and music client in one app: **MeeTube** for videos. No ads, a liquid-glass interface, synced lyrics, background playback and downloads.
 
 ## Features
 
-- **MeeTune:** YouTube Music with synced lyrics, an equalizer, spatial sound, crossfade and Android Auto.
 - **Player:** gestures, picture-in-picture, sleep timer, SponsorBlock and DeArrow.
 - **Feeds:** Home, Shorts, Search, Subscriptions, channels, posts and live chat.
 - **Downloads:** up to 4K, with lyrics for songs, playable offline.
