@@ -1,0 +1,262 @@
+package com.newtube.mobile.ui.settings;
+
+import android.content.Context;
+import android.os.Build;
+
+import androidx.annotation.NonNull;
+
+import com.liskovsoft.appupdatechecker2.AppUpdateChecker;
+import com.liskovsoft.sharedutils.helpers.AppInfoHelpers;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.AppUpdatePresenter;
+import com.liskovsoft.smartyoutubetv2.common.misc.DiagnosticLog;
+import com.liskovsoft.smartyoutubetv2.common.utils.Utils;
+import com.liskovsoft.smartyoutubetv2.tv.R;
+import com.newtube.mobile.ui.about.AboutShareRows;
+import com.newtube.mobile.ui.common.ThemeMode;
+
+import com.newtube.mobile.ui.common.BatterySaver;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * The phone Settings tree (issue #2), modelled on YouTube's: a top level of sections with icons,
+ * each opening one short page. Pages are built on demand from the prefs classes; page ids are plain
+ * strings so a recreated screen rebuilds the same pages.
+ *
+ * <pre>
+ * Settings
+ *   [ Search settings ]          (SettingsSearchFragment: every row of every page)
+ *   Video:    Playback · Video quality · Audio quality · Captions · SponsorBlock · DeArrow
+ *   App:      General · Customization · Notifications
+ *   Content:  Feeds · History and privacy · Downloads
+ *   Device:   Storage · Battery · Backup and restore
+ *   Other:    Advanced · About
+ * </pre>
+ */
+public final class SettingsPages {
+    public static final String ROOT = "root";
+    public static final String GENERAL = "general";
+    public static final String CUSTOMIZE = "customize";
+    public static final String CUSTOMIZE_THEME = "customize_theme";
+    public static final String CUSTOMIZE_LISTS = "customize_lists";
+    public static final String CUSTOMIZE_PLAYER = "customize_player";
+    public static final String CUSTOMIZE_BARS = "customize_bars";
+    public static final String CUSTOMIZE_EFFECTS = "customize_effects";
+    public static final String FEEDS = "feeds";
+    public static final String FEEDS_TABS = "feeds_tabs";
+    public static final String FEEDS_HIDDEN = "feeds_hidden";
+    public static final String FEEDS_MENU = "feeds_menu";
+    public static final String PLAYER_BUTTONS = "player_buttons";
+    public static final String PRIVACY = "privacy";
+    public static final String PLAYBACK = "playback";
+    public static final String QUALITY = "quality";
+    public static final String AUDIO = "audio";
+    public static final String CAPTIONS = "captions";
+    public static final String SPONSORBLOCK = "sponsorblock";
+    public static final String DEARROW = "dearrow";
+    public static final String DOWNLOADS = "downloads";
+    public static final String NOTIFICATIONS = "notifications";
+    public static final String BACKUP = "backup";
+    public static final String STORAGE = "storage";
+    public static final String BATTERY = "battery";
+    public static final String ADVANCED = "advanced";
+    public static final String ABOUT = "about";
+    public static final String TV_INSTALL = "tv_install";
+
+    /** A built page: its title and rows. */
+    public static final class Page {
+        final CharSequence title;
+        final List<SettingsRow> rows;
+
+        Page(CharSequence title, List<SettingsRow> rows) {
+            this.title = title;
+            this.rows = rows;
+        }
+    }
+
+    private SettingsPages() {
+    }
+
+    @NonNull
+    static Page build(@NonNull Context context, @NonNull String id) {
+        switch (id) {
+            case GENERAL:
+                return AppPages.general(context);
+            case CUSTOMIZE:
+                return AppPages.customize(context);
+            case CUSTOMIZE_THEME:
+                return AppPages.customizeTheme(context);
+            case CUSTOMIZE_LISTS:
+                return AppPages.customizeLists(context);
+            case CUSTOMIZE_PLAYER:
+                return AppPages.customizePlayer(context);
+            case CUSTOMIZE_BARS:
+                return AppPages.customizeBars(context);
+            case CUSTOMIZE_EFFECTS:
+                return AppPages.customizeEffects(context);
+            case FEEDS:
+                return AppPages.feeds(context);
+            case FEEDS_TABS:
+                return AppPages.tabs(context);
+            case FEEDS_HIDDEN:
+                return AppPages.hidden(context);
+            case FEEDS_MENU:
+                return AppPages.videoMenu(context);
+            case PLAYER_BUTTONS:
+                return AppPages.playerButtons(context);
+            case PRIVACY:
+                return AppPages.privacy(context);
+            case PLAYBACK:
+                return PlayerPages.playback(context);
+            case QUALITY:
+                return PlayerPages.quality(context);
+            case AUDIO:
+                return PlayerPages.audio(context);
+            case CAPTIONS:
+                return PlayerPages.captions(context);
+            case SPONSORBLOCK:
+                return PlayerPages.sponsorBlock(context);
+            case DEARROW:
+                return PlayerPages.deArrow(context);
+            case DOWNLOADS:
+                return DownloadPages.downloads(context);
+            case NOTIFICATIONS:
+                return NotificationPages.notifications(context);
+            case BACKUP:
+                return AppPages.backup(context);
+            case STORAGE:
+                return StoragePage.page(context);
+            case BATTERY:
+                return battery(context);
+            case ADVANCED:
+                return PlayerPages.advanced(context);
+            case ABOUT:
+                return about(context);
+            case TV_INSTALL:
+                return Build.VERSION.SDK_INT >= 26 ? TvInstall.page(context) : root(context);
+            case ROOT:
+            default:
+                return root(context);
+        }
+    }
+
+    private static Page root(Context context) {
+        List<SettingsRow> rows = new ArrayList<>();
+
+        // MEETUBE: no account or coffee rows here - the You tab switches accounts, About thanks.
+        rows.add(SettingsRow.header(context.getString(R.string.mobile_settings_group_video)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_playback, context.getString(R.string.mobile_settings_playback),
+                context.getString(R.string.mobile_settings_playback_summary), PLAYBACK));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_quality, context.getString(R.string.mobile_settings_quality),
+                null, QUALITY).summary(() -> PlayerPages.qualitySummary(context)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_audio, context.getString(R.string.mobile_settings_audio_quality),
+                context.getString(R.string.mobile_settings_audio_quality_summary), AUDIO));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_captions, context.getString(R.string.mobile_settings_captions),
+                context.getString(R.string.mobile_settings_captions_summary), CAPTIONS));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_sponsorblock, context.getString(R.string.content_block_provider),
+                null, SPONSORBLOCK).summary(() -> PlayerPages.sponsorBlockSummary(context)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_dearrow, context.getString(R.string.dearrow_provider),
+                null, DEARROW).summary(() -> PlayerPages.deArrowSummary(context)));
+
+        rows.add(SettingsRow.header(context.getString(R.string.mobile_settings_group_app)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_general, context.getString(R.string.mobile_settings_general),
+                context.getString(R.string.mobile_settings_general_summary), GENERAL));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_customize, context.getString(R.string.mobile_settings_customize),
+                context.getString(R.string.mobile_settings_customize_summary), CUSTOMIZE)
+                .summary(() -> customizeSummary(context)));
+        rows.add(SettingsRow.page(R.drawable.ic_about_notifications, context.getString(R.string.mobile_settings_notifications),
+                null, NOTIFICATIONS).summary(() -> NotificationPages.summary(context)));
+
+        rows.add(SettingsRow.header(context.getString(R.string.mobile_settings_group_content)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_feeds, context.getString(R.string.mobile_settings_feeds),
+                context.getString(R.string.mobile_settings_feeds_summary), FEEDS));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_privacy, context.getString(R.string.mobile_settings_privacy),
+                context.getString(R.string.mobile_settings_privacy_summary), PRIVACY));
+        rows.add(SettingsRow.page(R.drawable.ic_nav_downloads_outline, context.getString(R.string.header_downloads),
+                context.getString(R.string.mobile_settings_downloads_summary), DOWNLOADS));
+
+        rows.add(SettingsRow.header(context.getString(R.string.mobile_settings_group_device)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_storage, context.getString(R.string.mobile_settings_storage),
+                context.getString(R.string.mobile_settings_storage_summary), STORAGE));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_battery, context.getString(R.string.mobile_settings_battery),
+                null, BATTERY).summary(() -> context.getString(BatterySaver.isManual(context)
+                ? R.string.mobile_settings_battery_manual_on : BatterySaver.mode(context) == BatterySaver.LIGHT
+                ? R.string.mobile_settings_battery_light : R.string.mobile_settings_battery_keep)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_backup, context.getString(R.string.mobile_settings_backup),
+                context.getString(R.string.mobile_settings_backup_summary), BACKUP));
+
+        rows.add(SettingsRow.header(context.getString(R.string.mobile_settings_group_other)));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_advanced, context.getString(R.string.mobile_settings_advanced),
+                context.getString(R.string.mobile_settings_advanced_summary), ADVANCED));
+        rows.add(SettingsRow.page(R.drawable.ic_settings_about, context.getString(R.string.check_for_updates),
+                versionLine(context), ABOUT));
+        // Install on TV lives in About.
+        for (SettingsRow row : rows) { // the top list stays minimal: names only, what is inside shows on the page
+            row.summary = null;
+        }
+
+        return new Page(context.getString(R.string.header_settings), rows);
+    }
+
+    /** MEETUBE(issue #93): what Battery Saver does to the effects. */
+    private static Page battery(Context context) {
+        List<SettingsRow> rows = new ArrayList<>();
+        rows.add(SettingsRow.toggle(context.getString(R.string.mobile_settings_battery_manual),
+                context.getString(R.string.mobile_settings_battery_manual_summary),
+                () -> BatterySaver.isManual(context), on -> BatterySaver.setManual(context, on)));
+        rows.add(SettingsRow.<Integer>choice(context.getString(R.string.mobile_settings_battery_when))
+                .option(context.getString(R.string.mobile_settings_battery_light),
+                        context.getString(R.string.mobile_settings_battery_light_desc), BatterySaver.LIGHT)
+                .option(context.getString(R.string.mobile_settings_battery_keep),
+                        context.getString(R.string.mobile_settings_battery_keep_desc), BatterySaver.KEEP)
+                .bind(() -> BatterySaver.mode(context), mode -> BatterySaver.setMode(context, mode)));
+        rows.add(SettingsRow.note(context.getString(R.string.mobile_settings_battery_note)));
+        return new Page(context.getString(R.string.mobile_settings_battery), rows);
+    }
+
+    /** "Dark theme, tabs, ...": the theme is what people open Customization for most. */
+    private static CharSequence customizeSummary(Context context) {
+        int theme = ThemeMode.get();
+        String themeLabel = context.getString(theme == ThemeMode.LIGHT ? R.string.mobile_settings_theme_light_short
+                : theme == ThemeMode.DARK ? R.string.mobile_settings_theme_dark_short : R.string.mobile_settings_theme_system_short);
+        return context.getString(R.string.mobile_settings_customize_summary_value, themeLabel);
+    }
+
+    private static String versionLine(Context context) {
+        return context.getString(R.string.app_name) + " " + AppInfoHelpers.getAppVersionName(context);
+    }
+
+    private static Page about(Context context) {
+        List<SettingsRow> rows = new ArrayList<>();
+        if (AppUpdatePresenter.isInAppUpdatesDisabled()) {
+            // Store build (-Pfdroid): the version stays, the update row and switch go.
+            rows.add(icon(R.drawable.ic_mobile_update,
+                    SettingsRow.action(context.getString(R.string.mobile_settings_version), versionLine(context), page -> { })));
+        } else {
+            rows.add(icon(R.drawable.ic_mobile_update, SettingsRow.action(context.getString(R.string.check_for_updates),
+                    versionLine(context), page -> AppUpdatePresenter.instance(page.requireContext()).start(true))));
+            AppUpdateChecker checker = new AppUpdateChecker(context, null);
+            rows.add(icon(R.drawable.ic_about_notifications, SettingsRow.toggle(context.getString(R.string.check_updates_auto),
+                    context.getString(R.string.mobile_settings_update_notify_summary),
+                    checker::isUpdateCheckEnabled, on -> {
+                        checker.setUpdateCheckEnabled(on);
+                        // MEETUBE(update notify): the background check follows this switch
+                        com.newtube.mobile.update.UpdateNotifyWorker.schedule(context);
+                    })));
+            // MEETUBE(update pop-up): "Don't ask again" on the pop-up turns this off.
+            com.newtube.mobile.update.AppUpdates updates = com.newtube.mobile.update.AppUpdates.instance(context);
+            rows.add(icon(R.drawable.ic_about_campaign, SettingsRow.toggle(context.getString(R.string.mobile_settings_update_prompt),
+                    context.getString(R.string.mobile_settings_update_prompt_summary),
+                    () -> !updates.isPromptOff(), on -> updates.setPromptOff(!on))));
+        }
+
+        return new Page(context.getString(R.string.check_for_updates), rows);
+    }
+
+    /** MEETUBE(about): an About row's icon, in the same glass bead as the top level's. */
+    private static SettingsRow icon(@androidx.annotation.DrawableRes int icon, SettingsRow row) {
+        row.icon = icon;
+        return row;
+    }
+}
